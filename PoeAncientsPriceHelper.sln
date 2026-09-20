@@ -9,6 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeAncientsPriceHelper", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeAncientsPriceHelper.Tests", "src\PoeAncientsPriceHelper.Tests\PoeAncientsPriceHelper.Tests.csproj", "{C09DF16C-C39F-43EC-8031-A4A1F5565F9F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "overlay", "overlay", "{178A59AB-26FA-0D53-5A85-CE27EDD23CDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeTradeOverlay", "overlay\PoeTradeOverlay\PoeTradeOverlay.csproj", "{2918D112-C145-4A70-82BA-836BC667CE17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoeTradeOverlay.Tests", "overlay\PoeTradeOverlay.Tests\PoeTradeOverlay.Tests.csproj", "{636BF5A8-FF20-4505-88DE-A502C0B28991}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +49,30 @@ Global
 		{C09DF16C-C39F-43EC-8031-A4A1F5565F9F}.Release|x64.Build.0 = Release|Any CPU
 		{C09DF16C-C39F-43EC-8031-A4A1F5565F9F}.Release|x86.ActiveCfg = Release|Any CPU
 		{C09DF16C-C39F-43EC-8031-A4A1F5565F9F}.Release|x86.Build.0 = Release|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Debug|x64.Build.0 = Debug|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Debug|x86.Build.0 = Debug|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Release|x64.ActiveCfg = Release|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Release|x64.Build.0 = Release|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Release|x86.ActiveCfg = Release|Any CPU
+		{2918D112-C145-4A70-82BA-836BC667CE17}.Release|x86.Build.0 = Release|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Debug|x64.Build.0 = Debug|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Debug|x86.Build.0 = Debug|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Release|Any CPU.Build.0 = Release|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Release|x64.ActiveCfg = Release|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Release|x64.Build.0 = Release|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Release|x86.ActiveCfg = Release|Any CPU
+		{636BF5A8-FF20-4505-88DE-A502C0B28991}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,5 +80,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3133C7B1-4311-4D21-B16F-F1CDB88811F9} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{C09DF16C-C39F-43EC-8031-A4A1F5565F9F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{2918D112-C145-4A70-82BA-836BC667CE17} = {178A59AB-26FA-0D53-5A85-CE27EDD23CDA}
+		{636BF5A8-FF20-4505-88DE-A502C0B28991} = {178A59AB-26FA-0D53-5A85-CE27EDD23CDA}
 	EndGlobalSection
 EndGlobal
