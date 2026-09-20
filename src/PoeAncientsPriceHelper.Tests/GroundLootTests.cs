@@ -4,6 +4,29 @@ namespace PoeAncientsPriceHelper.Tests;
 
 public class GroundLootTests
 {
+    private static PriceSnapshot Snapshot(params string[] keys)
+    {
+        var prices = keys.ToDictionary(x => x, _ => new PriceEntry(1m, 100m));
+        return new PriceSnapshot(prices, prices.Keys.GroupBy(x => x.Length).ToDictionary(g => g.Key, g => g.ToList()));
+    }
+
+    [Theory]
+    [InlineData("uncut skill gem level 20", "uncut skill gem level 20")]
+    [InlineData("uncot spirit gem level 19", "uncut spirit gem level 19")]
+    [InlineData("skill level 18 frost bomb", "uncut skill gem level 18")]
+    public void ResolvePriceKey_PinsGemTypeAndLevel(string text, string expected)
+    {
+        var snap = Snapshot(expected);
+        Assert.Equal(expected, GroundLootScanEngine.ResolvePriceKey(text, snap).Key);
+    }
+
+    [Fact]
+    public void ResolvePriceKey_GemWithoutReadableLevel_DoesNotFuzzyGuess()
+    {
+        var snap = Snapshot("uncut spirit gem level 18", "uncut spirit gem level 19");
+        Assert.Null(GroundLootScanEngine.ResolvePriceKey("uncut spirit gem", snap).Key);
+    }
+
     [Theory]
     [InlineData("Exalted Orb", "Exalted Orb", 1, false)]
     [InlineData("Exalted Orb x12", "Exalted Orb", 12, true)]

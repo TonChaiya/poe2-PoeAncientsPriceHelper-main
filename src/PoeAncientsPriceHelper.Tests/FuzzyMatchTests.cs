@@ -54,6 +54,13 @@ public class FuzzyMatchTests
         Assert.Equal(expectedKey, key);
     }
 
+    [Fact]
+    public void TryResolveGemKey_RunePanelSkillLevel_MapsToUncutSkillGem()
+    {
+        Assert.True(ScanEngine.TryResolveGemKey("skill level 19 storm wave", out var key));
+        Assert.Equal("uncut skill gem level 19", key);
+    }
+
     // A gem whose level can't be read is still recognised as a gem (so it never falls through to
     // fuzzy), but yields no key → the row shows '?' instead of guessing a neighbouring level.
     [Fact]

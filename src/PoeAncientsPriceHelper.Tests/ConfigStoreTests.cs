@@ -47,18 +47,6 @@ public class ConfigStoreTests
     }
 
     [Fact]
-    public void AvailableLeagues_NotDuplicated_OnRoundTrip()
-    {
-        // Newtonsoft's ObjectCreationHandling.Auto appends a deserialized list onto a pre-populated
-        // default, doubling entries. AvailableLeagues is [JsonIgnore]'d to stay code-only and avoid it.
-        using var dir = new TempDir();
-        SaveTo(dir.Path, new AppConfig());
-        var loaded = LoadFrom(dir.Path);
-        Assert.Equal(new AppConfig().AvailableLeagues, loaded.AvailableLeagues);
-        Assert.Equal(loaded.AvailableLeagues.Count, loaded.AvailableLeagues.Distinct().Count());
-    }
-
-    [Fact]
     public void Load_ReturnsDefaults_WhenJsonMalformed()
     {
         using var dir = new TempDir();

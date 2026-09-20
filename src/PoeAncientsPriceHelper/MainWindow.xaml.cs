@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower
     };
     private bool _loading;
+    private IReadOnlyList<LeagueOption> _leagueOptions = [];
     // Reentrancy guard for LeagueBox_SelectionChanged → StartupAsync (rapid league changes could
     // otherwise overlap and dispose repo/icons mid-fetch). Also remembers whether the scanner was
     // running before a league change so StartupAsync can restart it against the new repo/icons.
@@ -63,6 +64,16 @@ public partial class MainWindow : Window
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         _config = ConfigStore.Load();
+        var catalog = await new LeagueCatalog(_http).LoadAsync();
+        _leagueOptions = catalog.Leagues;
+        var selected = _leagueOptions.FirstOrDefault(x =>
+            string.Equals(x.Id, _config.LeagueName, StringComparison.OrdinalIgnoreCase))
+            ?? _leagueOptions.First();
+        if (!string.Equals(_config.LeagueName, selected.Id, StringComparison.Ordinal))
+        {
+            _config.LeagueName = selected.Id;
+            ConfigStore.Save(_config);
+        }
         PopulateFields();
         // When already running in debug mode the relaunch is pointless — repurpose the link to open the
         // folder the logs land in. App.DebugMode is settled by now (it's set in App.OnStartup, before the
@@ -131,10 +142,9 @@ public partial class MainWindow : Window
     private void PopulateFields()
     {
         _loading = true;
-        LeagueBox.ItemsSource = _config.AvailableLeagues;
-        LeagueBox.SelectedItem = _config.AvailableLeagues.Contains(_config.LeagueName)
-            ? _config.LeagueName
-            : _config.AvailableLeagues.FirstOrDefault();
+        LeagueBox.ItemsSource = _leagueOptions;
+        LeagueBox.SelectedItem = _leagueOptions.FirstOrDefault(x =>
+            string.Equals(x.Id, _config.LeagueName, StringComparison.OrdinalIgnoreCase));
         // Arm the global hook with all three persisted bindings. The keybind UI lives in the Settings
         // window now, but the hook must be armed at startup so the hotkeys work before it's ever opened.
         App.SetStartStopChord(HotkeyBinding.ParseChord(_config.StartStopHotkey));
@@ -158,7 +168,7 @@ public partial class MainWindow : Window
         var local = System.IO.Path.Combine(AppContext.BaseDirectory, "docs", "README.html");
         var target = System.IO.File.Exists(local)
             ? local
-            : "https://github.com/pedro-quiterio/PoeAncientsPriceHelper#readme";
+            : "https://github.com/TonChaiya/poe2-PoeAncientsPriceHelper-main#readme";
         try
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(target) { UseShellExecute = true });
@@ -476,13 +486,13 @@ public partial class MainWindow : Window
 
     private async void LeagueBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        if (_loading || LeagueBox.SelectedItem is not string league || league == _config.LeagueName) return;
+        if (_loading || LeagueBox.SelectedItem is not LeagueOption league || league.Id == _config.LeagueName) return;
         if (_startingUp) return;  // prevent overlapping StartupAsync calls (rapid league changes)
         _startingUp = true;
         try
         {
             LeagueBox.IsEnabled = false;  // disable during reload
-            _config.LeagueName = league;
+            _config.LeagueName = league.Id;
             ConfigStore.Save(_config);
             await StartupAsync();   // re-fetch prices for the newly selected league
         }

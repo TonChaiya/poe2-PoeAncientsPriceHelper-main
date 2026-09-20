@@ -186,10 +186,20 @@ internal sealed class GroundLootScanEngine : IDisposable
     private (string? Key, bool Exact) ResolveName(string name, PriceSnapshot snap)
     {
         if (_cache.TryGetValue(name, out var hit)) return hit;
-        if (snap.Prices.ContainsKey(name)) return _cache[name] = (name, true);
+        return _cache[name] = ResolvePriceKey(name, snap);
+    }
+
+    internal static (string? Key, bool Exact) ResolvePriceKey(string name, PriceSnapshot snap)
+    {
+        // Gem prices vary sharply by level. Resolve them before generic matching and never fuzzy-match
+        // an incomplete gem label to a neighbouring level.
+        if (ScanEngine.TryResolveGemKey(name, out var gemKey))
+            return gemKey is not null && snap.Prices.ContainsKey(gemKey) ? (gemKey, true) : (null, false);
+
+        if (snap.Prices.ContainsKey(name)) return (name, true);
 
         string lookup = name.Any(char.IsDigit) ? NameNormalizer.DigitFold(name) : name;
-        if (snap.Prices.ContainsKey(lookup)) return _cache[name] = (lookup, true);
+        if (snap.Prices.ContainsKey(lookup)) return (lookup, true);
 
         string? best = null;
         double bestScore = 0.87; // tighter than panel OCR: full-screen text has more false candidates
@@ -203,7 +213,7 @@ internal sealed class GroundLootScanEngine : IDisposable
                 if (score > bestScore) { bestScore = score; best = key; }
             }
         }
-        return _cache[name] = (best, bestScore >= 0.94);
+        return (best, bestScore >= 0.94);
     }
 
     public void Dispose()

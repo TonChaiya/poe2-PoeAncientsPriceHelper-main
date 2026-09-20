@@ -646,6 +646,7 @@ internal sealed class ScanEngine : IDisposable
     // Pre-compiled regexes for gem detection (TryResolveGemKey runs on every OCR'd line).
     private static readonly Regex GemTypePattern = new(@"\b(skill|spirit|support)\b", RegexOptions.Compiled);
     private static readonly Regex GemLevelPattern = new(@"\blevel\s+(\d+)\b", RegexOptions.Compiled);
+    private static readonly Regex RuneSkillLevelPattern = new(@"\bskill\s+level\s+(\d+)\b", RegexOptions.Compiled);
 
     // Minimum character-similarity (1 - editDistance/maxLen) for a fuzzy price match.
     // 0.84 lets ~2 wrong characters through on a 12+ char name, 1 on a ~6 char name —
@@ -692,6 +693,12 @@ internal sealed class ScanEngine : IDisposable
     internal static bool TryResolveGemKey(string normalizedName, out string? key)
     {
         key = null;
+        var runeSkill = RuneSkillLevelPattern.Match(normalizedName);
+        if (runeSkill.Success)
+        {
+            key = $"uncut skill gem level {runeSkill.Groups[1].Value}";
+            return true;
+        }
         if (!normalizedName.Contains("gem")) return false;
         var type = GemTypePattern.Match(normalizedName);
         if (!type.Success) return false;
