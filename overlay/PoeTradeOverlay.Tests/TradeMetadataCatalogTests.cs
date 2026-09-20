@@ -7,6 +7,33 @@ namespace PoeTradeOverlay.Tests;
 public sealed class TradeMetadataCatalogTests
 {
     [Fact]
+    public void Current_trade_item_schema_without_entry_id_is_parsed()
+    {
+        const string items = """
+            {"result":[{"id":"accessory","label":"Accessories","entries":[
+              {"type":"Crimson Amulet"},
+              {"type":"Sapphire Ring","text":"Dream Fragments Sapphire Ring","name":"Dream Fragments","flags":{"unique":true}}
+            ]}]}
+            """;
+        var snapshot = TradeMetadataParser.Parse(new MetadataCacheEnvelope(1, DateTimeOffset.UtcNow,
+            items, "{\"result\":[]}", "{\"result\":[]}"));
+
+        Assert.Collection(snapshot.Items,
+            item =>
+            {
+                Assert.Equal("Crimson Amulet", item.Id);
+                Assert.Equal("Crimson Amulet", item.Name);
+                Assert.Equal("accessory", item.Category);
+            },
+            item =>
+            {
+                Assert.Equal("Dream Fragments Sapphire Ring", item.Id);
+                Assert.Equal("Dream Fragments", item.Name);
+                Assert.Equal("accessory", item.Category);
+            });
+    }
+
+    [Fact]
     public async Task Fresh_valid_cache_is_used_without_http()
     {
         using var temp = new TempDirectory();

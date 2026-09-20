@@ -36,13 +36,29 @@ internal static class TradeMetadataParser
             throw new JsonException("Trade metadata has no result array.");
     }
 
-    private static TradeItemDefinition[] ParseItems(JsonElement root) =>
-        Entries(root).Select(x => new TradeItemDefinition(
-                x.GetProperty("id").GetString() ?? "",
-                x.TryGetProperty("text", out var text) ? text.GetString() ?? "" :
-                    x.TryGetProperty("name", out var name) ? name.GetString() ?? "" : "",
-                x.TryGetProperty("type", out var type) ? type.GetString() : null))
-            .Where(x => x.Id.Length > 0 && x.Name.Length > 0).ToArray();
+    private static TradeItemDefinition[] ParseItems(JsonElement root)
+    {
+        var definitions = new List<TradeItemDefinition>();
+        foreach (var group in root.GetProperty("result").EnumerateArray())
+        {
+            string? category = group.TryGetProperty("id", out var categoryNode)
+                ? categoryNode.GetString()
+                : null;
+            if (!group.TryGetProperty("entries", out var entries) || entries.ValueKind != JsonValueKind.Array)
+                continue;
+            foreach (var entry in entries.EnumerateArray())
+            {
+                string type = entry.TryGetProperty("type", out var typeNode) ? typeNode.GetString() ?? "" : "";
+                string text = entry.TryGetProperty("text", out var textNode) ? textNode.GetString() ?? "" : "";
+                string name = entry.TryGetProperty("name", out var nameNode) ? nameNode.GetString() ?? "" : "";
+                string id = text.Length > 0 ? text : type;
+                string displayName = name.Length > 0 ? name : id;
+                if (id.Length > 0 && displayName.Length > 0)
+                    definitions.Add(new TradeItemDefinition(id, displayName, category));
+            }
+        }
+        return definitions.ToArray();
+    }
 
     private static TradeStatDefinition[] ParseStats(JsonElement root) =>
         Entries(root).Select(x => new TradeStatDefinition(
