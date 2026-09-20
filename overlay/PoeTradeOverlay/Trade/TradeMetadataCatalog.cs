@@ -10,7 +10,7 @@ public sealed record MetadataCacheEnvelope(
     string StatsJson,
     string FiltersJson);
 
-public sealed class TradeMetadataCatalog
+public sealed class TradeMetadataCatalog : ITradeMetadataProvider
 {
     private static readonly TimeSpan MaxAge = TimeSpan.FromDays(7);
     private readonly HttpClient _http;
