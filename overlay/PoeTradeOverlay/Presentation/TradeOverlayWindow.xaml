@@ -1,0 +1,59 @@
+<Window x:Class="PoeTradeOverlay.Presentation.TradeOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PoE 2 Detailed Trade Check" Width="430" Height="620"
+        ShowActivated="False" Topmost="True" ResizeMode="CanResizeWithGrip"
+        WindowStyle="ToolWindow" Background="#111714" Foreground="#E7EEE9"
+        Closing="Window_Closing">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/><RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding ItemName}" FontSize="18" FontWeight="SemiBold" Foreground="#80F0A0" TextWrapping="Wrap"/>
+        <TextBlock Grid.Row="1" Text="{Binding Status}" Margin="0,4,0,10" Foreground="#A8B8AD" TextWrapping="Wrap"/>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Filters}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#2B3A31" BorderThickness="0,0,0,1" Padding="0,7">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="24"/><ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="65"/><ColumnDefinition Width="65"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox IsChecked="{Binding IsEnabled}" IsEnabled="{Binding CanEnable}" VerticalAlignment="Top"/>
+                                <StackPanel Grid.Column="1" Margin="4,0,8,0">
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="11"/>
+                                    <TextBlock Text="{Binding SupportLabel}" Foreground="#829087" FontSize="9"/>
+                                    <TextBlock Text="{Binding ValidationMessage}" Foreground="#FF7676" FontSize="9"/>
+                                </StackPanel>
+                                <TextBox Grid.Column="2" Text="{Binding MinText, UpdateSourceTrigger=PropertyChanged}" Margin="2" ToolTip="Minimum"/>
+                                <TextBox Grid.Column="3" Text="{Binding MaxText, UpdateSourceTrigger=PropertyChanged}" Margin="2" ToolTip="Maximum"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Grid Grid.Row="3" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Median" Foreground="#8FA096" FontSize="10"/>
+                <TextBlock Text="{Binding MedianText}" FontSize="17" FontWeight="Bold"/>
+                <TextBlock Text="{Binding RangeText, StringFormat=Typical: {0}}" FontSize="11"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="{Binding MatchText}" HorizontalAlignment="Right"/>
+                <TextBlock Text="{Binding SampleText}" HorizontalAlignment="Right" FontSize="10"/>
+                <TextBlock Text="{Binding ConfidenceText}" HorizontalAlignment="Right" FontSize="10" Foreground="#E0BC69"/>
+            </StackPanel>
+        </Grid>
+        <Button Grid.Row="4" Content="Search price" IsEnabled="{Binding CanSearch}"
+                Margin="0,12,0,6" Padding="10,7" Background="#275D38" Foreground="White"
+                Click="Search_Click"/>
+        <TextBlock Grid.Row="5" Text="This product isn't affiliated with or endorsed by Grinding Gear Games in any way."
+                   Foreground="#6F7B73" FontSize="9" TextWrapping="Wrap"/>
+    </Grid>
+</Window>
