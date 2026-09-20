@@ -60,6 +60,7 @@ public partial class SettingsWindow : Window
 
         AutoStartBox.IsChecked = _config.AutoStart;
         PauseWhenUnfocusedBox.IsChecked = _config.PauseWhenGameNotFocused;
+        DetailedTradeOverlayBox.IsChecked = _config.DetailedTradeOverlayEnabled;
 
         // Rumour helper (#36): on/off + scan rate presets. Tag carries the interval in ms persisted to
         // config.RumourScanIntervalMs. If the saved value isn't a preset, fall back to Normal for display
@@ -138,6 +139,13 @@ public partial class SettingsWindow : Window
     {
         if (_loading) return;
         _config.PauseWhenGameNotFocused = PauseWhenUnfocusedBox.IsChecked == true;
+        ConfigStore.Save(_config);
+    }
+
+    private void DetailedTradeOverlayBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        _config.DetailedTradeOverlayEnabled = DetailedTradeOverlayBox.IsChecked == true;
         ConfigStore.Save(_config);
     }
 

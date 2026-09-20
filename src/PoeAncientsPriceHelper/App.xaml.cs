@@ -155,6 +155,7 @@ public partial class App : System.Windows.Application
             if (chord == b.Debug) FireHotkey(chord, PriceOverlayManager.ToggleDebug);
             else if (chord == b.Calibrate) FireHotkey(chord, InvokeCalibrate);
             else if (chord == b.StartStop) FireHotkey(chord, InvokeStartStopToggle);
+            else if (TradeOverlayHost.IsManualCopyChord(chord)) InvokeDetailedTradeCopy();
             // Debug-only one-shot rumour read (#34 spine). F8 triggers a full-screen detect + overlay;
             // the WORLD-gated auto-detect loop (#35) supersedes this manual trigger.
             else if (DebugMode && chord == new Chord(KeyCode.VcF8)) InvokeRumourScan();
@@ -266,6 +267,9 @@ public partial class App : System.Windows.Application
 
     private static void InvokeRumourScan() =>
         Current?.Dispatcher.BeginInvoke(() => (Current.MainWindow as MainWindow)?.RunRumourScanOnce());
+
+    private static void InvokeDetailedTradeCopy() =>
+        Current?.Dispatcher.BeginInvoke(() => (Current.MainWindow as MainWindow)?.HandleDetailedTradeCopy());
 
     protected override void OnExit(ExitEventArgs e)
     {

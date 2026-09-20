@@ -2,6 +2,10 @@ using System.Net;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Media;
+using PoeTradeOverlay;
+using PoeTradeOverlay.Clipboard;
+using PoeTradeOverlay.Presentation;
+using PoeTradeOverlay.Trade;
 using SharpHook.Data;
 
 namespace PoeAncientsPriceHelper;
@@ -43,6 +47,10 @@ public partial class MainWindow : Window
     // running before a league change so StartupAsync can restart it against the new repo/icons.
     private bool _startingUp;
     private bool _engineWasRunning;
+    private HttpClient? _tradeHttp;
+    private TradeOverlayWindow? _tradeWindow;
+    private TradeOverlayController? _tradeController;
+    private TradeOverlayHost? _tradeHost;
 
     // Minimize-to-tray (#2). The window hides to a tray icon on minimize and restores from it; the X
     // button still fully exits. Scanning is independent of this window, so it keeps running in the tray.
@@ -84,6 +92,7 @@ public partial class MainWindow : Window
             DiagnosticsLink.ToolTip = "Open the folder with scan_log.txt and debug_ocr.png";
         }
         await StartupAsync();
+        InitTradeOverlay();
         InitRumourHelper();
         // Auto-start QoL: with a calibrated region and the option enabled, begin scanning and drop
         // straight to the tray, so the user just opens the app and it runs (saving the Start + minimize
@@ -348,6 +357,47 @@ public partial class MainWindow : Window
         _rumourEngine.Start();
     }
 
+    private void InitTradeOverlay()
+    {
+        if (_tradeHost is not null || _repo is null) return;
+        _tradeHttp = new HttpClient(new SocketsHttpHandler
+        {
+            AutomaticDecompression = System.Net.DecompressionMethods.All,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+            MaxConnectionsPerServer = 2,
+            UseCookies = false,
+            AllowAutoRedirect = false,
+            ConnectCallback = static (context, ct) => HappyEyeballs.ConnectAsync(context.DnsEndPoint, ct)
+        })
+        {
+            Timeout = TimeSpan.FromSeconds(15),
+            DefaultRequestVersion = HttpVersion.Version20,
+            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower
+        };
+        _tradeWindow = new TradeOverlayWindow();
+        var metadata = new TradeMetadataCatalog(_tradeHttp,
+            System.IO.Path.Combine(AppPaths.DataDir, "overlay", "trade-metadata.json"));
+        _tradeController = new TradeOverlayController(
+            new WpfClipboardReader(), metadata, new PathOfExileTradeClient(_tradeHttp),
+            new OverlayCurrencyConverter(() => _repo?.Prices ?? new Dictionary<string, PriceEntry>()),
+            _tradeWindow, _config.LeagueName);
+        _tradeWindow.SetSearchHandler(_tradeController.SearchEditedAsync);
+        _tradeHost = new TradeOverlayHost(_config, GameWindow.IsGameClientForeground,
+            _tradeController.OnManualCopyAsync, _tradeController.SetLeague, _tradeController.DisposeAsync);
+    }
+
+    internal async void HandleDetailedTradeCopy()
+    {
+        try
+        {
+            if (_tradeHost is not null) await _tradeHost.OnManualCopyAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[TradeOverlay] item check failed: {ex.Message}");
+        }
+    }
+
     // The screen the rumour loop watches: the monitor PoE runs on (derived from the calibrated price
     // region when available), else the primary monitor.
     // The manual WORLD gate region (#45), or null to let the loop auto-detect it. Read live each gate
@@ -480,6 +530,8 @@ public partial class MainWindow : Window
         _rumourCapture?.Dispose();
         _repo?.Dispose();
         _icons?.Dispose();
+        _tradeHost?.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        _tradeHttp?.Dispose();
         _http.Dispose();
         System.Windows.Application.Current.Shutdown();
     }
@@ -494,6 +546,7 @@ public partial class MainWindow : Window
             LeagueBox.IsEnabled = false;  // disable during reload
             _config.LeagueName = league.Id;
             ConfigStore.Save(_config);
+            _tradeHost?.SetLeague(league.Id);
             await StartupAsync();   // re-fetch prices for the newly selected league
         }
         finally

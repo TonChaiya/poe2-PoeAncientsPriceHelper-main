@@ -44,6 +44,23 @@ internal static class GameWindow
         return true;
     }
 
+    // Strict foreground check for the clipboard Trade feature. Unlike the OCR pause gate this MUST
+    // fail closed: a Ctrl+C in an editor/browser must never be treated as a copied game item. Helper
+    // windows owned by this process are deliberately not counted as the game here.
+    public static bool IsGameClientForeground()
+    {
+        var foreground = GetForegroundWindow();
+        if (foreground == IntPtr.Zero) return false;
+        GetWindowThreadProcessId(foreground, out uint pid);
+        if (pid == 0) return false;
+        try
+        {
+            using var process = Process.GetProcessById((int)pid);
+            return process.ProcessName.StartsWith(ProcessPrefix, StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
+    }
+
     // Is the game in front? NOT an exact-handle test: some clients (multiple top-level windows, the
     // borderless/overlay child that actually takes focus) make GetForegroundWindow() return a window
     // that ISN'T the process's MainWindowHandle, so `fg == handle` reads as "not foreground" forever and

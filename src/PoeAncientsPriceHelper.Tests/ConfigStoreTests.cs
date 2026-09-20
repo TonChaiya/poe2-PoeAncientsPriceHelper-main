@@ -8,6 +8,13 @@ namespace PoeAncientsPriceHelper.Tests;
 public class ConfigStoreTests
 {
     [Fact]
+    public void Detailed_trade_overlay_defaults_enabled_for_existing_configs()
+    {
+        var config = new AppConfig();
+        Assert.True(config.DetailedTradeOverlayEnabled);
+    }
+
+    [Fact]
     public void Load_ReturnsDefaults_WhenFileDoesNotExist()
     {
         using var dir = new TempDir();

@@ -132,6 +132,12 @@
                    Foreground="#666" FontSize="10" TextWrapping="Wrap" Margin="0,4,0,0"/>
 
         <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical" Margin="0,14,0,0">
+            <CheckBox x:Name="DetailedTradeOverlayBox" Foreground="#CCC" FontSize="12"
+                      Content="Detailed Trade overlay — read items copied with Ctrl+C"
+                      Checked="DetailedTradeOverlayBox_Changed" Unchecked="DetailedTradeOverlayBox_Changed"/>
+            <TextBlock Foreground="#888" FontSize="10" TextWrapping="Wrap" Margin="0,3,0,10"
+                       Text="Only while PoE 2 is active. Sends supported structured filters anonymously to Path of Exile Trade; no credentials, game-file access, or input automation."/>
+            <Border Height="1" Background="#2A2A2A" Margin="0,0,0,10"/>
             <CheckBox x:Name="PauseWhenUnfocusedBox" Foreground="#CCC" FontSize="12"
                       Content="Only scan while Path of Exile is the active window"
                       Checked="PauseWhenUnfocusedBox_Changed" Unchecked="PauseWhenUnfocusedBox_Changed"/>

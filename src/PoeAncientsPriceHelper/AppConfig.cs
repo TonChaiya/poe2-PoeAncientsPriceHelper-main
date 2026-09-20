@@ -37,6 +37,10 @@ internal sealed class AppConfig
     // wrongly reads the game as not-foreground). Missing in older configs → the default true, unchanged.
     public bool PauseWhenGameNotFocused { get; set; } = true;
 
+    // On-demand detailed Trade check. It reacts only after the player manually copies an item with
+    // Ctrl+C while the actual PoE client owns foreground focus; it never synthesizes input.
+    public bool DetailedTradeOverlayEnabled { get; set; } = true;
+
     // Island Rumour helper (#36). Enabled by default; when off, the WORLD-gated auto-detect loop is
     // fully idle (no gate check, no OCR). Missing in older configs → the initializer keeps these
     // defaults (Newtonsoft only overwrites keys present in the file), exactly like AutoStart above.
