@@ -67,8 +67,8 @@ try {
     $uninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Poe2GroundLootPriceHelper'
     New-Item -Path $uninstallKey -Force | Out-Null
     New-ItemProperty -Path $uninstallKey -Name DisplayName -Value $productName -PropertyType String -Force | Out-Null
-    New-ItemProperty -Path $uninstallKey -Name DisplayVersion -Value '3.8.1' -PropertyType String -Force | Out-Null
-    New-ItemProperty -Path $uninstallKey -Name Publisher -Value 'Local development build' -PropertyType String -Force | Out-Null
+    New-ItemProperty -Path $uninstallKey -Name DisplayVersion -Value '1.0.0' -PropertyType String -Force | Out-Null
+    New-ItemProperty -Path $uninstallKey -Name Publisher -Value 'TonChaiya independent fork' -PropertyType String -Force | Out-Null
     New-ItemProperty -Path $uninstallKey -Name InstallLocation -Value $installRoot -PropertyType String -Force | Out-Null
     New-ItemProperty -Path $uninstallKey -Name DisplayIcon -Value "$exePath,0" -PropertyType String -Force | Out-Null
     New-ItemProperty -Path $uninstallKey -Name UninstallString -Value "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$uninstallScript`"" -PropertyType String -Force | Out-Null
@@ -77,7 +77,7 @@ try {
 
     Start-Process -FilePath $exePath -WorkingDirectory $installRoot
     [System.Windows.MessageBox]::Show(
-        "$productName 3.8.1 was installed successfully.",
+        "$productName 1.0.0 was installed successfully.",
         $productName,
         'OK',
         'Information') | Out-Null

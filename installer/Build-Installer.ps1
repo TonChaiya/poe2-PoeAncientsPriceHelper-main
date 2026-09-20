@@ -9,7 +9,7 @@ $artifactsRoot = Join-Path $projectRoot '.artifacts\installer'
 $publishDir = Join-Path $artifactsRoot 'publish'
 $payloadDir = Join-Path $artifactsRoot 'payload'
 $outputDir = Join-Path $projectRoot 'install'
-$setupPath = Join-Path $outputDir 'Poe2GroundLootPriceHelper-0.5.4-v3.8.1-Setup.exe'
+$setupPath = Join-Path $outputDir 'Poe2GroundLootPriceHelper-v1.0.0-Setup.exe'
 $sedPath = Join-Path $artifactsRoot 'package.sed'
 $projectFile = Join-Path $projectRoot 'src\PoeAncientsPriceHelper\PoeAncientsPriceHelper.csproj'
 
@@ -57,7 +57,7 @@ InstallPrompt=
 DisplayLicense=
 FinishMessage=
 TargetName=$setupPath
-FriendlyName=PoE2 Ground Loot Price Helper 0.5.4 Setup
+FriendlyName=PoE 2 Ground Loot Price Helper 1.0.0 Setup
 AppLaunched=Install.cmd
 PostInstallCmd=<None>
 AdminQuietInstCmd=Install.cmd
