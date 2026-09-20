@@ -106,9 +106,12 @@ public sealed class PathOfExileTradeClient : ITradeClient
     private static TradeListing[] ParseListings(string json)
     {
         using var doc = JsonDocument.Parse(json);
-        if (doc.RootElement.ValueKind != JsonValueKind.Array) throw new JsonException();
+        JsonElement rows = doc.RootElement;
+        if (rows.ValueKind == JsonValueKind.Object && rows.TryGetProperty("result", out var result))
+            rows = result;
+        if (rows.ValueKind != JsonValueKind.Array) throw new JsonException();
         var listings = new List<TradeListing>();
-        foreach (var row in doc.RootElement.EnumerateArray())
+        foreach (var row in rows.EnumerateArray())
         {
             string id = row.TryGetProperty("id", out var idNode) ? idNode.GetString() ?? "" : "";
             if (!row.TryGetProperty("listing", out var listing)) continue;

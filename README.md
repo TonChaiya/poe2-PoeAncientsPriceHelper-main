@@ -1,6 +1,8 @@
-# PoE 2 Ground Loot Price Helper — fork 1.0.0
+# PoE 2 Ground Loot + Detailed Trade Price Helper — fork 1.1.0
 
 Windows overlay for Path of Exile 2 that scans visible ground-item labels and places the current market price immediately after each label. It keeps the game's item name visible and works across the viewport rather than only a calibrated price panel.
+
+Version 1.1.0 also adds an integrated, on-demand equipment check: hover an item in PoE 2 and press the game's normal `Ctrl+C`. The helper reads that clipboard item only while the game is foreground, opens editable modifier filters, and displays an anonymous Trade market estimate.
 
 ## Highlights
 
@@ -11,20 +13,23 @@ Windows overlay for Path of Exile 2 that scans visible ground-item labels and pl
 - Understands stack counts and shows the total value.
 - Limits OCR/network work and pauses scanning while PoE is unfocused by default.
 - Contains no external software auto-update mechanism.
+- Checks modifier-dependent equipment through Path of Exile Trade without cookies, account credentials, input synthesis, or game-file/memory access.
 
 ## Install
 
-Run `install/Poe2GroundLootPriceHelper-v1.0.0-Setup.exe`. It installs per user, requires no administrator rights, and includes the required .NET runtime. Close an older running copy before installing.
+Run `install/Poe2GroundLootPriceHelper-v1.1.0-Setup.exe`. It installs per user, requires no administrator rights, and includes the required .NET runtime. Close an older running copy before installing.
 
-After launch, choose the league and start the ground-loot scan. Settings include capture mode, language, theme, hotkeys, focus pause, and diagnostics.
+After launch, choose the league and start the ground-loot scan. For detailed equipment pricing, hover the item and press `Ctrl+C`; supported weapons, armour, accessories, jewels, and charms open the filter window. Settings can disable this behavior.
 
 ## Price and network behavior
 
-League lists and market prices come from poe.ninja. The program downloads only those read-only market feeds and referenced icons; it does not upload screenshots, OCR results, configuration, or gameplay data. Price refreshes are not application updates.
+League lists, commodity prices, and currency conversion rates come from poe.ninja. Modifier-dependent equipment searches use the anonymous Path of Exile Trade search/fetch surface. The program does not upload screenshots, OCR results, configuration, gameplay data, raw clipboard history, cookies, tokens, or account credentials. Price refreshes are not application updates.
+
+The Trade website search surface can change without notice. The helper honors returned rate-limit headers and never retries a restricted request automatically. This product isn't affiliated with or endorsed by Grinding Gear Games in any way.
 
 ## Development
 
-See the [developer documentation](docs/README.md), [fork provenance](FORK_NOTES.md), [changelog](CHANGELOG.md), and [1.0.0 release record](docs/releases/1.0.0.md).
+See the [developer documentation](docs/README.md), [overlay module notes](overlay/README.md), [fork provenance](FORK_NOTES.md), [changelog](CHANGELOG.md), and [1.1.0 release record](docs/releases/1.1.0.md).
 
 ```powershell
 dotnet test PoeAncientsPriceHelper.sln -c Release

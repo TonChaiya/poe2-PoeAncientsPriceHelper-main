@@ -60,6 +60,21 @@ public sealed class PathOfExileTradeClientTests
         Assert.Single(handler.Requests);
     }
 
+    [Fact]
+    public async Task Fetch_result_envelope_is_parsed()
+    {
+        var handler = new QueueHandler(
+            Json(HttpStatusCode.OK, "{\"id\":\"search-2\",\"result\":[\"a\"],\"total\":1}"),
+            Json(HttpStatusCode.OK, "{\"result\":[{\"id\":\"a\",\"listing\":{\"account\":{\"name\":\"seller-a\"},\"price\":{\"amount\":7,\"currency\":\"exalted\"}}}]}"));
+        var client = new PathOfExileTradeClient(new HttpClient(handler));
+
+        var result = await client.SearchAsync("Runes of Aldur", ValidQuery(), default);
+
+        Assert.Null(result.Failure);
+        Assert.Single(result.Listings);
+        Assert.Equal(7m, result.Listings[0].Amount);
+    }
+
     private static TradeQuery ValidQuery() =>
         new(null, "Dualstring Bow", "weapon.bow", ItemRarity.Rare, false, []);
 

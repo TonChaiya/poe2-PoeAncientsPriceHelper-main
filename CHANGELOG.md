@@ -3,6 +3,22 @@
 All notable changes to the TonChaiya fork are documented here. This project uses an independent
 version sequence beginning at 1.0.0; it does not continue the upstream project's version numbers.
 
+## 1.1.0 — 2026-09-20
+
+### Added
+
+- Integrated detailed equipment price check triggered only by the player's normal `Ctrl+C` while PoE 2 is foreground.
+- Editable Trade filters for recognized equipment modifiers with unsupported lines shown instead of guessed.
+- Anonymous, rate-limit-aware Path of Exile Trade search/fetch client with cancellation and bounded responses.
+- Credible-low, typical range, median, sample size, and confidence display with duplicate-account and outlier handling.
+- Isolated `overlay/` library and test project for continued development.
+
+### Safety and performance
+
+- No synthesized input, game-file or memory access, packet capture, credentials, cookies, telemetry, seller contact, or trade automation.
+- No continuous clipboard polling; clipboard reads occur only within a bounded window after focused-game `Ctrl+C`.
+- Trade outages and schema changes remain isolated from the existing ground-loot OCR path.
+
 ## 1.0.0 — 2026-09-20
 
 ### Added

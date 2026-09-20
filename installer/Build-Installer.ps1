@@ -9,7 +9,7 @@ $artifactsRoot = Join-Path $projectRoot '.artifacts\installer'
 $publishDir = Join-Path $artifactsRoot 'publish'
 $payloadDir = Join-Path $artifactsRoot 'payload'
 $outputDir = Join-Path $projectRoot 'install'
-$setupPath = Join-Path $outputDir 'Poe2GroundLootPriceHelper-v1.0.0-Setup.exe'
+$setupPath = Join-Path $outputDir 'Poe2GroundLootPriceHelper-v1.1.0-Setup.exe'
 $sedPath = Join-Path $artifactsRoot 'package.sed'
 $projectFile = Join-Path $projectRoot 'src\PoeAncientsPriceHelper\PoeAncientsPriceHelper.csproj'
 
@@ -57,7 +57,7 @@ InstallPrompt=
 DisplayLicense=
 FinishMessage=
 TargetName=$setupPath
-FriendlyName=PoE 2 Ground Loot Price Helper 1.0.0 Setup
+FriendlyName=PoE 2 Ground Loot + Trade Price Helper 1.1.0 Setup
 AppLaunched=Install.cmd
 PostInstallCmd=<None>
 AdminQuietInstCmd=Install.cmd
@@ -85,14 +85,20 @@ $iexpress = Join-Path $env:WINDIR 'System32\iexpress.exe'
 if (-not (Test-Path -LiteralPath $iexpress)) {
     throw 'Windows IExpress is not available.'
 }
-& $iexpress /N /Q $sedPath
-$deadline = [DateTime]::UtcNow.AddMinutes(10)
-while (-not (Test-Path -LiteralPath $setupPath) -and [DateTime]::UtcNow -lt $deadline) {
-    $packagingActive = (Get-Process -Name 'iexpress', 'makecab' -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
-    if (-not $packagingActive) {
-        break
+if (Test-Path -LiteralPath $setupPath) {
+    Remove-Item -LiteralPath $setupPath -Force
+}
+
+# IExpress/makecab occasionally leaves only its temporary ~*.CAB when antivirus briefly locks the
+# final stub. One clean retry is deterministic and avoids publishing a partial artifact.
+for ($attempt = 1; $attempt -le 2 -and -not (Test-Path -LiteralPath $setupPath); $attempt++) {
+    Get-ChildItem -LiteralPath $outputDir -Filter ('~' + [IO.Path]::GetFileNameWithoutExtension($setupPath) + '.*') -File -ErrorAction SilentlyContinue |
+        Remove-Item -Force
+    $iexpressProcess = Start-Process -FilePath $iexpress -ArgumentList @('/N', '/Q', $sedPath) `
+        -Wait -PassThru -WindowStyle Hidden
+    if (-not (Test-Path -LiteralPath $setupPath) -and $attempt -eq 1) {
+        Start-Sleep -Seconds 1
     }
-    Start-Sleep -Seconds 1
 }
 
 if (-not (Test-Path -LiteralPath $setupPath)) {
