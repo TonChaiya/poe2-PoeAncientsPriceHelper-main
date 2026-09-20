@@ -30,7 +30,7 @@ public static class TradeQueryBuilder
         ["Rings"] = "accessory.ring",
         ["Amulets"] = "accessory.amulet",
         ["Belts"] = "accessory.belt",
-        ["Charms"] = "accessory.charm",
+        ["Charms"] = "flask.charm",
         ["Jewels"] = "jewel"
     };
 

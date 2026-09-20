@@ -28,6 +28,41 @@ public sealed class TradeOverlayControllerTests
     }
 
     [Fact]
+    public async Task Valid_copy_is_acknowledged_before_metadata_download_finishes()
+    {
+        var metadata = new TaskCompletionSource<TradeMetadataSnapshot>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var client = new FakeTradeClient(Task.FromResult(new TradeSearchResult("id", 0, [])));
+        var view = new FakeView();
+        await using var controller = new TradeOverlayController(
+            new QueueClipboard(Fixture.Read("rare-bow.txt")),
+            new DelayedMetadata(metadata.Task), client, new OneToOneCurrency(), view, "Runes of Aldur");
+
+        var copy = controller.OnManualCopyAsync();
+
+        Assert.Contains(view.States, state => state.IsLoading && state.Query is null && state.Status.Contains("Item read"));
+        Assert.Equal(0, client.Count);
+
+        metadata.SetResult(FakeMetadata.Snapshot());
+        await copy;
+    }
+
+    [Fact]
+    public async Task Metadata_failure_is_shown_without_starting_trade_search()
+    {
+        var client = new FakeTradeClient(Task.FromResult(new TradeSearchResult("id", 0, [])));
+        var view = new FakeView();
+        await using var controller = new TradeOverlayController(
+            new QueueClipboard(Fixture.Read("rare-bow.txt")),
+            new DelayedMetadata(Task.FromException<TradeMetadataSnapshot>(new HttpRequestException("offline"))),
+            client, new OneToOneCurrency(), view, "Runes of Aldur");
+
+        await controller.OnManualCopyAsync();
+
+        Assert.Equal(TradeFailureKind.Unavailable, view.Current!.Failure!.Kind);
+        Assert.Equal(0, client.Count);
+    }
+
+    [Fact]
     public async Task Late_result_from_previous_item_is_never_published()
     {
         var first = new TaskCompletionSource<TradeSearchResult>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -71,11 +106,18 @@ public sealed class TradeOverlayControllerTests
 
     private sealed class FakeMetadata : ITradeMetadataProvider
     {
-        public Task<TradeMetadataSnapshot> GetAsync(CancellationToken cancellationToken) => Task.FromResult(
+        public Task<TradeMetadataSnapshot> GetAsync(CancellationToken cancellationToken) => Task.FromResult(Snapshot());
+
+        public static TradeMetadataSnapshot Snapshot() =>
             new TradeMetadataSnapshot([], [
                 new TradeStatDefinition("explicit.fire", "+#% to Fire Resistance", ModifierKind.Explicit),
                 new TradeStatDefinition("implicit.mana", "+# to maximum Mana", ModifierKind.Implicit)
-            ], [], DateTimeOffset.UtcNow));
+            ], [], DateTimeOffset.UtcNow);
+    }
+
+    private sealed class DelayedMetadata(Task<TradeMetadataSnapshot> result) : ITradeMetadataProvider
+    {
+        public Task<TradeMetadataSnapshot> GetAsync(CancellationToken cancellationToken) => result.WaitAsync(cancellationToken);
     }
 
     private sealed class FakeTradeClient(params Task<TradeSearchResult>[] results) : ITradeClient

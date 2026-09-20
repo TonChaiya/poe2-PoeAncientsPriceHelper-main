@@ -26,6 +26,14 @@ public sealed class TradeQueryBuilderTests
         Assert.Equal("accessory.ring", query.Category);
     }
 
+    [Fact]
+    public void Charm_uses_the_current_trade_category_id()
+    {
+        Assert.True(PoeItemTextParser.TryParse(Fixture.Read("charm.txt"), out var item));
+        var query = TradeQueryBuilder.CreateRecommended(item, Metadata());
+        Assert.Equal("flask.charm", query.Category);
+    }
+
     private static TradeMetadataSnapshot Metadata() => new([], [
         new TradeStatDefinition("explicit.fire", "+#% to Fire Resistance", ModifierKind.Explicit),
         new TradeStatDefinition("implicit.mana", "+# to maximum Mana", ModifierKind.Implicit)

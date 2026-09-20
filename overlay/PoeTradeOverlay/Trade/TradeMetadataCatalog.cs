@@ -13,6 +13,7 @@ public sealed record MetadataCacheEnvelope(
 public sealed class TradeMetadataCatalog : ITradeMetadataProvider
 {
     private static readonly TimeSpan MaxAge = TimeSpan.FromDays(7);
+    private const int MaxMetadataBytes = 8 * 1024 * 1024;
     private readonly HttpClient _http;
     private readonly string _cachePath;
     private readonly TimeProvider _clock;
@@ -53,10 +54,15 @@ public sealed class TradeMetadataCatalog : ITradeMetadataProvider
     {
         async Task<string> Get(string suffix)
         {
-            using var response = await _http.GetAsync("https://www.pathofexile.com/api/trade2/data/" + suffix,
-                HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                "https://www.pathofexile.com/api/trade2/data/" + suffix);
+            request.Headers.TryAddWithoutValidation("User-Agent",
+                "Poe2GroundLootPriceHelper/1.1.0 (contact: https://github.com/TonChaiya/poe2-PoeAncientsPriceHelper-main)");
+            request.Headers.Referrer = new Uri("https://www.pathofexile.com/trade2/search/poe2");
+            using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await BoundedHttpContent.ReadStringAsync(response.Content, MaxMetadataBytes, cancellationToken);
         }
 
         var items = Get("items");

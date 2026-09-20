@@ -44,15 +44,41 @@ public sealed class TradeMetadataCatalogTests
         Assert.True(handler.Count >= 1);
     }
 
+    [Fact]
+    public async Task Metadata_requests_are_identifiable_and_do_not_send_credentials()
+    {
+        using var temp = new TempDirectory();
+        var handler = new CountingHandler(request => new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(request.RequestUri!.AbsolutePath.EndsWith("/stats", StringComparison.Ordinal)
+                ? StatsJson("explicit.fire", "+#% to Fire Resistance")
+                : "{\"result\":[]}")
+        });
+        var catalog = new TradeMetadataCatalog(new HttpClient(handler), Path.Combine(temp.Path, "metadata.json"));
+
+        await catalog.GetAsync(default);
+
+        Assert.Equal(3, handler.Requests.Count);
+        Assert.All(handler.Requests, request =>
+        {
+            Assert.Contains("Poe2GroundLootPriceHelper/1.1.0", request.UserAgent);
+            Assert.Null(request.Authorization);
+            Assert.Null(request.Cookie);
+        });
+    }
+
     private static string StatsJson(string id, string text) =>
         $$"""{"result":[{"label":"Explicit","entries":[{"id":"{{id}}","text":"{{text}}","type":"explicit"}]}]}""";
 
     private sealed class CountingHandler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler
     {
         public int Count { get; private set; }
+        public List<(string UserAgent, string? Authorization, string? Cookie)> Requests { get; } = [];
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Count++;
+            Requests.Add((request.Headers.UserAgent.ToString(), request.Headers.Authorization?.ToString(),
+                request.Headers.TryGetValues("Cookie", out var cookies) ? string.Join(";", cookies) : null));
             return Task.FromResult(respond(request));
         }
     }

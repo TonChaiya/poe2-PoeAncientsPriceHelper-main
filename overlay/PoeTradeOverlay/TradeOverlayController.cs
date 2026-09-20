@@ -59,7 +59,26 @@ public sealed class TradeOverlayController : IAsyncDisposable
             _lastFingerprint = WpfClipboardReader.Fingerprint(text);
             _currentItem = item;
 
-            var metadata = await _metadata.GetAsync(token);
+            if (!IsCurrent(generation, token)) return;
+            _view.Publish(new TradeOverlayState(generation, item, null, true, null, null,
+                "Item read — loading trade filters"));
+
+            TradeMetadataSnapshot metadata;
+            try
+            {
+                metadata = await _metadata.GetAsync(token);
+            }
+            catch (Exception) when (!token.IsCancellationRequested)
+            {
+                if (IsCurrent(generation, token))
+                {
+                    var failure = new TradeFailure(TradeFailureKind.Unavailable,
+                        "Trade filter data is unavailable. Try again later.");
+                    _view.Publish(new TradeOverlayState(generation, item, null, false, null, failure,
+                        failure.Message));
+                }
+                return;
+            }
             var query = TradeQueryBuilder.CreateRecommended(item, metadata);
             if (!IsCurrent(generation, token)) return;
             _view.Publish(new TradeOverlayState(generation, item, query, true, null, null, "Item read — searching price"));
