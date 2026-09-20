@@ -13,6 +13,7 @@ dotnet restore PoeAncientsPriceHelper.sln
 dotnet test PoeAncientsPriceHelper.sln -c Release
 dotnet build PoeAncientsPriceHelper.sln -c Release
 powershell -NoProfile -ExecutionPolicy Bypass -File .\installer\Build-Installer.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\installer\Verify-Installer.ps1
 ```
 
 Run tests before and after behavior changes. Add a failing regression test first for fixes. Keep captures, caches, and generated artifacts out of Git.
@@ -31,4 +32,3 @@ For diagnostics, launch with `--debug`; logs and debug images are written beneat
 4. Run all tests, Release build, package validation, updater scan, and dependency vulnerability scan.
 5. Build the self-contained installer and record its SHA-256.
 6. Confirm only the intended installer is in `install/`, commit, and push only to the owner-approved remote.
-
