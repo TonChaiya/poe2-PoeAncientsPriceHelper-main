@@ -3,6 +3,21 @@
 All notable changes to the TonChaiya fork are documented here. This project uses an independent
 version sequence beginning at 1.0.0; it does not continue the upstream project's version numbers.
 
+## 1.2.0 — 2026-09-20
+
+### Changed
+
+- Rebuilt the detailed Trade window around a compact PoE-style item summary, modifier grid, estimate card, and lowest-listings table.
+- Automatic display and Search clicks now use a native no-activate window policy so they do not take focus from the game.
+- Keyboard editing is an explicit mode; Borderless display mode is recommended while typing into filters.
+- Requirement and modifier-tier annotation lines no longer appear as Trade filters.
+- Rolled-value annotations such as `+11(10-17)` now normalize to the corresponding Trade stat template.
+
+### Safety and performance
+
+- The focus fix uses only normal Windows window styles; it does not inject into or modify the game.
+- Listing display remains read-only and does not whisper sellers or automate trades.
+
 ## 1.1.0 — 2026-09-20
 
 ### Added

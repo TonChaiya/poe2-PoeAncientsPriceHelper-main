@@ -90,6 +90,8 @@ public static class PoeItemTextParser
 
     private static bool IsNonModifierProperty(string line) =>
         line.StartsWith("Requirements:", StringComparison.OrdinalIgnoreCase) ||
+        line.StartsWith("Requires Level ", StringComparison.OrdinalIgnoreCase) ||
+        (line.StartsWith('{') && line.EndsWith('}')) ||
         line.StartsWith("Level:", StringComparison.OrdinalIgnoreCase) ||
         line.StartsWith("Str:", StringComparison.OrdinalIgnoreCase) ||
         line.StartsWith("Dex:", StringComparison.OrdinalIgnoreCase) ||

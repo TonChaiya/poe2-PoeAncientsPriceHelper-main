@@ -15,7 +15,7 @@
 3. `PoeItemTextParser` creates an immutable item model; `TradeMetadataCatalog` maps modifiers only when a unique Trade stat template matches.
 4. `PathOfExileTradeClient` sends one anonymous search and one bounded fetch for the selected league, honoring rate-limit headers and cancellation.
 5. `PriceEstimator` normalizes currencies from the current poe.ninja snapshot, removes duplicate-account listings and statistical outliers, then reports a range, median, and confidence.
-6. `TradeOverlayWindow` displays editable filters. Changes remain local until the player presses `Search price`.
+6. `TradeOverlayWindow` displays a passive no-activate price view with matched filters and low-price listings. Search clicks stay passive; explicit Edit filters mode enables keyboard focus. Changes remain local until the player presses `Search price`.
 
 ## Main components
 

@@ -44,6 +44,31 @@ public sealed class TradeOverlayViewModelTests
         Assert.Contains("14", vm.SampleText);
     }
 
+    [Fact]
+    public void Separates_supported_filters_and_formats_item_summary_and_listings()
+    {
+        var query = new TradeQuery(null, "Luxurious Slippers", "armour.boots", ItemRarity.Rare, true,
+        [
+            new("30% increased Movement Speed", "explicit.speed", true, true, 30m),
+            new("Unknown modifier", null, false, false)
+        ]);
+        var state = new TradeOverlayState(1,
+            new ParsedItem(ItemRarity.Rare, "Foe Pace", "Luxurious Slippers", "Boots", 71, 20, true, [],
+                new Dictionary<string, decimal>()), query, false, null, null, "Ready",
+            [new TradeListing("a", "seller#1234", 2m, "divine")]);
+        var vm = new TradeOverlayViewModel();
+
+        vm.Apply(state);
+
+        Assert.Equal("RARE", vm.RarityText);
+        Assert.Equal("Item Level 71", vm.ItemLevelText);
+        Assert.Equal("Corrupted", vm.CorruptedText);
+        Assert.Single(vm.SupportedFilters);
+        Assert.Single(vm.UnsupportedFilters);
+        Assert.Equal("2 divine", vm.Listings.Single().PriceText);
+        Assert.Equal("seller#1234", vm.Listings.Single().Account);
+    }
+
     private static TradeOverlayState State(TradeQuery query) => new(1,
         new ParsedItem(ItemRarity.Rare, "Storm Loop", "Ring", "Rings", 80, 20, false, [],
             new Dictionary<string, decimal>()), query, false, null, null, "Item read");

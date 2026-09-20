@@ -98,7 +98,7 @@ public sealed class PathOfExileTradeClient : ITradeClient
     {
         var request = new HttpRequestMessage(method, url);
         request.Headers.TryAddWithoutValidation("User-Agent",
-            "Poe2GroundLootPriceHelper/1.1.0 (contact: https://github.com/TonChaiya/poe2-PoeAncientsPriceHelper-main)");
+            "Poe2GroundLootPriceHelper/1.2.0 (contact: https://github.com/TonChaiya/poe2-PoeAncientsPriceHelper-main)");
         request.Headers.Referrer = new Uri("https://www.pathofexile.com/trade2/search/poe2");
         return request;
     }

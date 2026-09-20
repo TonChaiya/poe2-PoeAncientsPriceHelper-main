@@ -39,6 +39,18 @@ public sealed class ModifierMatcherTests
         Assert.False(match.IsSupported);
     }
 
+    [Fact]
+    public void Rolled_value_range_annotation_does_not_prevent_a_match()
+    {
+        var snapshot = Snapshot(("explicit.es", "+# to maximum Energy Shield", ModifierKind.Explicit));
+        var match = ModifierMatcher.Match(
+            new ParsedModifier("+11(10-17) to maximum Energy Shield", ModifierKind.Explicit, [11m, 10m, -17m]),
+            snapshot);
+
+        Assert.True(match.IsSupported);
+        Assert.Equal("explicit.es", match.StatId);
+    }
+
     private static TradeMetadataSnapshot Snapshot(params (string Id, string Text, ModifierKind Kind)[] stats) =>
         new([], stats.Select(x => new TradeStatDefinition(x.Id, x.Text, x.Kind)).ToArray(), [], DateTimeOffset.UtcNow);
 }

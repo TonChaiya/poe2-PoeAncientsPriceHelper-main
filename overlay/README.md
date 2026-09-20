@@ -22,3 +22,7 @@ dotnet test .\overlay\PoeTradeOverlay.Tests\PoeTradeOverlay.Tests.csproj
 ```
 
 The public website search surface is not guaranteed stable. A schema/authentication change must fail visibly and remain isolated from the ground-loot scanner; never work around it by reading browser cookies or asking for account credentials.
+
+## Focus behavior
+
+The Trade window starts in passive mode with the native `WS_EX_NOACTIVATE` extended style and rejects mouse activation. Automatic display, closing, and `Search price` therefore do not take foreground focus from PoE 2. `Edit filters` explicitly removes that style so text boxes can receive keyboard input; players using exclusive fullscreen should switch PoE 2 to Borderless before entering edit mode. This is an ordinary external window policy and does not inject into the game or use an in-game overlay SDK.

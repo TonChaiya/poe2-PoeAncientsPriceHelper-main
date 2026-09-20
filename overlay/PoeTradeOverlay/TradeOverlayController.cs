@@ -126,7 +126,8 @@ public sealed class TradeOverlayController : IAsyncDisposable
             ? PriceEstimator.Estimate(result.Listings, result.TotalMatches, _currency)
             : null;
         string status = result.Failure?.Message ?? (estimate is null ? "No priced listings found" : "Price estimate ready");
-        _view.Publish(new TradeOverlayState(generation, item, query, false, estimate, result.Failure, status));
+        _view.Publish(new TradeOverlayState(generation, item, query, false, estimate, result.Failure, status,
+            result.Listings));
     }
 
     private bool IsCurrent(long generation, CancellationToken token) =>

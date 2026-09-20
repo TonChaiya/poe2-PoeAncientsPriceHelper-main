@@ -9,4 +9,5 @@ public sealed record TradeOverlayState(
     bool IsLoading,
     PriceEstimate? Estimate,
     TradeFailure? Failure,
-    string Status);
+    string Status,
+    IReadOnlyList<TradeListing>? Listings = null);

@@ -25,6 +25,7 @@ public sealed class TradeOverlayControllerTests
         Assert.Equal(1, harness.Client.Count);
         Assert.Contains(harness.View.States, state => state.IsLoading && state.Query is not null);
         Assert.Equal("Storm Song", harness.View.Current!.Item.Name);
+        Assert.Single(harness.View.Current.Listings!);
     }
 
     [Fact]

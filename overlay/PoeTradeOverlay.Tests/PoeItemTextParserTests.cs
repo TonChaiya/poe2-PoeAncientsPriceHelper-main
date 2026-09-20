@@ -33,6 +33,30 @@ public sealed class PoeItemTextParserTests
         Assert.Contains(item.Modifiers, x => x.Text.Contains("ความต้านทานไฟ") && x.Kind == ModifierKind.Unknown);
     }
 
+    [Fact]
+    public void Requirements_and_modifier_annotations_are_not_trade_filters()
+    {
+        const string text = """
+            Item Class: Boots
+            Rarity: Rare
+            Foe Pace
+            Luxurious Slippers
+            --------
+            Item Level: 71
+            --------
+            Requires Level 70, 93 Int
+            --------
+            { Desecrated Prefix Modifier "Cheetah's" (Tier: 2) — Speed }
+            30% increased Movement Speed
+            +11(10-17) to maximum Energy Shield
+            """;
+
+        Assert.True(PoeItemTextParser.TryParse(text, out var item));
+        Assert.DoesNotContain(item.Modifiers, x => x.Text.StartsWith("Requires", StringComparison.Ordinal));
+        Assert.DoesNotContain(item.Modifiers, x => x.Text.StartsWith('{'));
+        Assert.Contains(item.Modifiers, x => x.Text == "30% increased Movement Speed");
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("ordinary clipboard text")]

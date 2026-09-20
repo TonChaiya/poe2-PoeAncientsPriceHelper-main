@@ -57,7 +57,7 @@ public sealed class TradeMetadataCatalog : ITradeMetadataProvider
             using var request = new HttpRequestMessage(HttpMethod.Get,
                 "https://www.pathofexile.com/api/trade2/data/" + suffix);
             request.Headers.TryAddWithoutValidation("User-Agent",
-                "Poe2GroundLootPriceHelper/1.1.0 (contact: https://github.com/TonChaiya/poe2-PoeAncientsPriceHelper-main)");
+                "Poe2GroundLootPriceHelper/1.2.0 (contact: https://github.com/TonChaiya/poe2-PoeAncientsPriceHelper-main)");
             request.Headers.Referrer = new Uri("https://www.pathofexile.com/trade2/search/poe2");
             using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead,
                 cancellationToken);

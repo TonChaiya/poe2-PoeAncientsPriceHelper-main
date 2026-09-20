@@ -16,6 +16,9 @@ public static partial class ModifierMatcher
     [GeneratedRegex(@"\s+", RegexOptions.CultureInvariant)]
     private static partial Regex WhitespacePattern();
 
+    [GeneratedRegex(@"\s*\([-+]?\d+(?:\.\d+)?\s*-\s*[-+]?\d+(?:\.\d+)?\)", RegexOptions.CultureInvariant)]
+    private static partial Regex RollRangePattern();
+
     public static ModifierMatch Match(ParsedModifier modifier, TradeMetadataSnapshot metadata)
     {
         string source = Normalize(modifier.Text);
@@ -32,6 +35,7 @@ public static partial class ModifierMatcher
     {
         text = Regex.Replace(text, @"\s*\((implicit|explicit|enchant|rune)\)\s*$", "",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        text = RollRangePattern().Replace(text, "");
         text = NumberPattern().Replace(text, "#");
         return WhitespacePattern().Replace(text.Trim(), " ");
     }
