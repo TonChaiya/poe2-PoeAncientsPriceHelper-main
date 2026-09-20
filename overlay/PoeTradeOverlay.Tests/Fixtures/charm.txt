@@ -1,0 +1,9 @@
+Item Class: Charms
+Rarity: Magic
+of Dousing
+Dousing Charm
+--------
+Item Level: 68
+--------
+Used when you become Ignited (implicit)
+Grants Immunity to Ignite for 3 seconds

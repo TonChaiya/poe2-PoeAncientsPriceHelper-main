@@ -1,0 +1,11 @@
+Item Class: Rings
+Rarity: Unique
+Dream Fragments
+Lazuli Ring
+--------
+Item Level: 76
+--------
++25 to maximum Mana (implicit)
+--------
++20% to Cold Resistance
+Cannot be Frozen

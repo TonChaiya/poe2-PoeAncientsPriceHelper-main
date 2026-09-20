@@ -1,0 +1,15 @@
+Item Class: Bows
+Rarity: Rare
+Storm Song
+Dualstring Bow
+--------
+Quality: +20% (augmented)
+Physical Damage: 100-200 (augmented)
+Attacks per Second: 1.50
+--------
+Item Level: 82
+--------
+Adds 12 to 24 Physical Damage
++35% to Fire Resistance
+--------
+Corrupted
