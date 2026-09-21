@@ -8,15 +8,27 @@ public sealed class CurrencyCatalog : ICurrencyConverter
     private static readonly IReadOnlyDictionary<string, string> Codes =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["exalted"] = "Exalted Orb", ["exa"] = "Exalted Orb", ["exalted orb"] = "Exalted Orb",
-            ["divine"] = "Divine Orb", ["div"] = "Divine Orb", ["divine orb"] = "Divine Orb",
-            ["vaal"] = "Vaal Orb", ["vaal orb"] = "Vaal Orb",
-            ["chaos"] = "Chaos Orb", ["chaos orb"] = "Chaos Orb",
-            ["regal"] = "Regal Orb", ["regal orb"] = "Regal Orb",
-            ["alchemy"] = "Orb of Alchemy", ["alch"] = "Orb of Alchemy", ["orb of alchemy"] = "Orb of Alchemy",
-            ["chance"] = "Orb of Chance", ["orb of chance"] = "Orb of Chance",
-            ["annul"] = "Orb of Annulment", ["orb of annulment"] = "Orb of Annulment",
-            ["mirror"] = "Mirror of Kalandra", ["mirror of kalandra"] = "Mirror of Kalandra"
+            ["exalted"] = "Exalted Orb",
+            ["exa"] = "Exalted Orb",
+            ["exalted orb"] = "Exalted Orb",
+            ["divine"] = "Divine Orb",
+            ["div"] = "Divine Orb",
+            ["divine orb"] = "Divine Orb",
+            ["vaal"] = "Vaal Orb",
+            ["vaal orb"] = "Vaal Orb",
+            ["chaos"] = "Chaos Orb",
+            ["chaos orb"] = "Chaos Orb",
+            ["regal"] = "Regal Orb",
+            ["regal orb"] = "Regal Orb",
+            ["alchemy"] = "Orb of Alchemy",
+            ["alch"] = "Orb of Alchemy",
+            ["orb of alchemy"] = "Orb of Alchemy",
+            ["chance"] = "Orb of Chance",
+            ["orb of chance"] = "Orb of Chance",
+            ["annul"] = "Orb of Annulment",
+            ["orb of annulment"] = "Orb of Annulment",
+            ["mirror"] = "Mirror of Kalandra",
+            ["mirror of kalandra"] = "Mirror of Kalandra"
         };
 
     private readonly IReadOnlyDictionary<string, decimal> _rates;

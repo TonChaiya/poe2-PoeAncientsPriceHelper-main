@@ -28,7 +28,7 @@ public sealed class PathOfExileTradeClientTests
         {
             Assert.Null(request.Authorization);
             Assert.Null(request.Cookie);
-            Assert.Contains("Poe2GroundLootPriceHelper/1.2.0", request.UserAgent);
+            Assert.Contains("Poe2GroundLootPriceHelper/1.3.0", request.UserAgent);
         });
     }
 

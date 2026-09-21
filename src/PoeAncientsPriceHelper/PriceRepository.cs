@@ -172,7 +172,7 @@ internal sealed class PriceRepository : IDisposable
         var url = $"https://poe.ninja/poe2/api/economy/exchange/current/overview?league={Uri.EscapeDataString(league)}&type={type}";
 
         var req = new HttpRequestMessage(HttpMethod.Get, url);
-        req.Headers.TryAddWithoutValidation("User-Agent", "Poe2GroundLootPriceHelper/1.2.0 (independent fork)");
+        req.Headers.TryAddWithoutValidation("User-Agent", "Poe2GroundLootPriceHelper/1.3.0 (independent fork)");
         req.Headers.TryAddWithoutValidation("Referer",
             $"https://poe.ninja/poe2/economy/{slug}/{typeSlug}");
 
@@ -193,7 +193,7 @@ internal sealed class PriceRepository : IDisposable
         var typeSlug = type.ToLowerInvariant();
         var url = $"https://poe.ninja/poe2/api/economy/stash/current/item/overview?league={Uri.EscapeDataString(league)}&type={type}";
         using var req = new HttpRequestMessage(HttpMethod.Get, url);
-        req.Headers.TryAddWithoutValidation("User-Agent", "Poe2GroundLootPriceHelper/1.2.0 (independent fork)");
+        req.Headers.TryAddWithoutValidation("User-Agent", "Poe2GroundLootPriceHelper/1.3.0 (independent fork)");
         req.Headers.TryAddWithoutValidation("Referer", $"https://poe.ninja/poe2/economy/{slug}/{typeSlug}");
         using var resp = await _http.SendAsync(req, ct);
         if (!resp.IsSuccessStatusCode)

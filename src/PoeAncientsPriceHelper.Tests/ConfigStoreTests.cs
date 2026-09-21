@@ -41,7 +41,10 @@ public class ConfigStoreTests
         var original = new AppConfig
         {
             LeagueName = "Test League",
-            RegionX = 10, RegionY = 20, RegionWidth = 300, RegionHeight = 400,
+            RegionX = 10,
+            RegionY = 20,
+            RegionWidth = 300,
+            RegionHeight = 400,
             OverlayXOffset = 16,
             CustomPricesPath = "my_prices.json"
         };

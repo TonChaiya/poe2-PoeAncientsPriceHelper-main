@@ -232,13 +232,13 @@ internal sealed class RumourScanEngine : IDisposable
     internal static bool ContainsWorldToken(IEnumerable<OcrTextLine> lines)
     {
         foreach (var line in lines)
-        foreach (var tok in NameNormalizer.Normalize(line.Text).Split(' ', StringSplitOptions.RemoveEmptyEntries))
-        {
-            if (tok == "world") return true;
-            if (tok.Length is >= 4 and <= 7 &&
-                1.0 - (double)ScanEngine.Levenshtein(tok, "world") / 5.0 >= 0.6)   // ≤2 edits from "world"
-                return true;
-        }
+            foreach (var tok in NameNormalizer.Normalize(line.Text).Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (tok == "world") return true;
+                if (tok.Length is >= 4 and <= 7 &&
+                    1.0 - (double)ScanEngine.Levenshtein(tok, "world") / 5.0 >= 0.6)   // ≤2 edits from "world"
+                    return true;
+            }
         return false;
     }
 

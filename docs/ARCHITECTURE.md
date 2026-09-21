@@ -12,10 +12,11 @@
 
 1. The existing keyboard hook observes an exact `Ctrl+C` release and the host verifies the real Path of Exile process owns foreground focus.
 2. `TradeOverlayController` performs four bounded clipboard attempts and rejects unchanged, incomplete, commodity, or unsupported text.
-3. `PoeItemTextParser` creates an immutable item model; `TradeMetadataCatalog` maps modifiers only when a unique Trade stat template matches.
-4. `PathOfExileTradeClient` sends one anonymous search and one bounded fetch for the selected league, honoring rate-limit headers and cancellation.
-5. `PriceEstimator` normalizes currencies from the current poe.ninja snapshot, removes duplicate-account listings and statistical outliers, then reports a range, median, and confidence.
-6. `TradeOverlayWindow` displays a passive no-activate price view with matched filters and low-price listings. Search clicks stay passive; explicit Edit filters mode enables keyboard focus. Changes remain local until the player presses `Search price`.
+3. `PoeItemTextParser` separates identity, requirements, properties, state flags, headers, current values, and roll ranges. `ModifierMatcher` resolves declared families first and leaves duplicate-family text ambiguous.
+4. `TradeQueryBuilder` creates Crafting Base, Quick Price, or Broad queries across identity, type, equipment, requirement, stat, and miscellaneous domains.
+5. `PathOfExileTradeClient` sends one anonymous Instant Buy search and fetches at most twenty IDs in sequential chunks of ten, honoring rate-limit headers and preserving partial results.
+6. `PriceEstimator` normalizes every available listing currency from the current poe.ninja snapshot, removes duplicate-account listings and statistical outliers, then reports range, median, conversion coverage, and confidence.
+7. `TradeOverlayWindow` displays Professional Compact in passive no-activate mode. Mouse controls and title dragging remain passive; explicit Edit enables typing and returns focus before Search.
 
 ## Main components
 

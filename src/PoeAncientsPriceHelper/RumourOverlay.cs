@@ -202,7 +202,10 @@ internal sealed class RumourOverlayForm : Form
             var dst = new POINT { x = Bounds.Left, y = Bounds.Top };
             var blend = new BLENDFUNCTION
             {
-                BlendOp = AC_SRC_OVER, BlendFlags = 0, SourceConstantAlpha = 255, AlphaFormat = AC_SRC_ALPHA,
+                BlendOp = AC_SRC_OVER,
+                BlendFlags = 0,
+                SourceConstantAlpha = 255,
+                AlphaFormat = AC_SRC_ALPHA,
             };
             UpdateLayeredWindow(Handle, screenDc, ref dst, ref size, memDc, ref src, 0, ref blend, ULW_ALPHA);
         }
@@ -344,7 +347,8 @@ internal sealed class RumourOverlayForm : Form
 
     [StructLayout(LayoutKind.Sequential)] private struct POINT { public int x, y; }
     [StructLayout(LayoutKind.Sequential)] private struct SIZE { public int cx, cy; }
-    [StructLayout(LayoutKind.Sequential)] private struct BLENDFUNCTION
+    [StructLayout(LayoutKind.Sequential)]
+    private struct BLENDFUNCTION
     {
         public byte BlendOp, BlendFlags, SourceConstantAlpha, AlphaFormat;
     }
@@ -355,7 +359,8 @@ internal sealed class RumourOverlayForm : Form
     [DllImport("gdi32.dll")] private static extern bool DeleteDC(IntPtr hDC);
     [DllImport("gdi32.dll")] private static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
     [DllImport("gdi32.dll")] private static extern bool DeleteObject(IntPtr hObject);
-    [DllImport("user32.dll")] private static extern bool UpdateLayeredWindow(
+    [DllImport("user32.dll")]
+    private static extern bool UpdateLayeredWindow(
         IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize, IntPtr hdcSrc,
         ref POINT pptSrc, int crKey, ref BLENDFUNCTION pblend, int dwFlags);
 }
@@ -399,7 +404,8 @@ internal static class RumourOverlayManager
                 _form = f;
                 System.Windows.Forms.Application.Run(f);
                 lock (_lock) _form = null;
-            }) { IsBackground = true, Name = "RumourOverlay-STA" };
+            })
+            { IsBackground = true, Name = "RumourOverlay-STA" };
             _thread.SetApartmentState(ApartmentState.STA);
             _thread.Start();
             ready.Wait(TimeSpan.FromSeconds(2));

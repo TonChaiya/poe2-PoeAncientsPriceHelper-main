@@ -13,4 +13,4 @@
 | `old/` | Local archive supplied by the owner; intentionally ignored and never published. |
 | `.artifacts/` | Temporary build/review/extraction output; ignored. |
 
-Core ownership boundaries: `LeagueCatalog` owns league discovery and cache policy; `PriceRepository` owns market snapshots; scan engines own capture/OCR scheduling; overlays own drawing only; `MainWindow` coordinates lifecycle and user selection.
+Core ownership boundaries: `LeagueCatalog` owns league discovery and cache policy; `PriceRepository` owns market and currency snapshots; scan engines own capture/OCR scheduling; `PoeTradeOverlay` owns structured item parsing, Trade contracts, valuation, and its passive window; `MainWindow` coordinates lifecycle and user selection.

@@ -5,15 +5,15 @@
 ## Boundaries
 
 - `Clipboard/` performs four bounded reads after the host observes a manual focused-game `Ctrl+C`.
-- `Parsing/` validates copied PoE 2 item text and keeps commodities on the existing poe.ninja path.
-- `Trade/` owns metadata, unique stat-template matching, request DTOs, anonymous search/fetch, body limits, cancellation, and rate limits.
-- `Pricing/` converts listing currencies through a read-only host snapshot and calculates credible estimates.
+- `Parsing/` validates copied PoE 2 item text and separates requirements/properties/states from typed modifier blocks.
+- `Trade/` owns metadata families, evidence-ordered resolution, three search profiles, request DTOs, anonymous Instant Buy search/fetch, body limits, cancellation, and rate limits.
+- `Pricing/` resolves Trade currency codes through the selected-league snapshot, preserves original prices, and calculates credible estimates with conversion coverage.
 - `Presentation/` owns filter rows, view state, placement, and the WPF window.
 - `TradeOverlayController` is the single-request orchestration and stale-result guard.
 
 ## Maintenance rules
 
-Keep all Trade endpoint paths and JSON details inside `Trade/`. Add or update sanitized fixtures before changing item parsing. A modifier may be sent only when exactly one normalized stat template of the compatible kind matches. Do not log or cache raw copied item text.
+Keep all Trade endpoint paths and JSON details inside `Trade/`. Add or update sanitized fixtures before changing item parsing. A modifier may be sent only when exactly one normalized stat template of the compatible family matches. Ambiguous lines remain visible and disabled. Do not log or cache raw copied item text.
 
 Run:
 
@@ -25,4 +25,4 @@ The public website search surface is not guaranteed stable. A schema/authenticat
 
 ## Focus behavior
 
-The Trade window starts in passive mode with the native `WS_EX_NOACTIVATE` extended style and rejects mouse activation. Automatic display, closing, and `Search price` therefore do not take foreground focus from PoE 2. `Edit filters` explicitly removes that style so text boxes can receive keyboard input; players using exclusive fullscreen should switch PoE 2 to Borderless before entering edit mode. This is an ordinary external window policy and does not inject into the game or use an in-game overlay SDK.
+The 420-DIP Professional Compact window starts in passive mode with the native `WS_EX_NOACTIVATE` extended style and rejects mouse activation. Automatic display, profile/filter mouse controls, title dragging, closing, and Search therefore do not activate it. `Edit` explicitly removes that style so text boxes can receive keyboard input; Done, Escape, and Search restore passive mode and the previous foreground window. Players using exclusive fullscreen should switch PoE 2 to Borderless before entering edit mode. This is an ordinary external window policy and does not inject into the game or use an in-game overlay SDK.

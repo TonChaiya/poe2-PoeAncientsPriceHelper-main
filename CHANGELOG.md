@@ -3,6 +3,27 @@
 All notable changes to the TonChaiya fork are documented here. This project uses an independent
 version sequence beginning at 1.0.0; it does not continue the upstream project's version numbers.
 
+## 1.3.0 — 2026-09-21
+
+### Added
+
+- Evidence-based modifier-family resolution for implicit, explicit, fractured, crafted, enchant, rune/augment, desecrated, pseudo, sanctum, and skill stats.
+- Crafting Base, Quick Price, and Broad −10% profiles with editable Min/Max controls.
+- Mixed-currency listing display and live league conversion, including Vaal Orb prices.
+
+### Fixed
+
+- Requirements are no longer misclassified as modifiers; current rolls and roll ranges are preserved separately.
+- Trade searches use Instant Buy, correct filter domains, and two bounded fetch chunks of ten.
+- Ambiguous same-text modifiers remain visible and unchecked instead of choosing a wrong family.
+- The overlay can be dragged in passive mode and restores the previous game focus after Edit/Search.
+
+### UI and safety
+
+- Replaced the detailed popup with the approved 420-DIP Professional Compact layout.
+- No game files, memory, packets, input synthesis, browser cookies, account tokens, or seller automation.
+- No external software auto-update; release binaries are built from this fork only.
+
 ## 1.2.0 — 2026-09-20
 
 ### Changed

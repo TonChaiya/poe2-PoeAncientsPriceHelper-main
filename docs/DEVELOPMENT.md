@@ -5,7 +5,9 @@
 
 The root `overlay/PoeTradeOverlay` class library is intentionally separated from screen capture and OCR. Keep endpoint DTOs inside `Trade/`, keep parsing and pricing pure, and exercise HTTP only through fake handlers in automated tests. Live calls are manual verification only.
 
-When Path of Exile changes item text or Trade metadata, add a sanitized fixture first, watch the test fail, then update parsing or mapping. Never make fuzzy stat matches: ambiguous modifiers must stay visible as unsupported. Do not add cookie/session discovery, synthesized input, seller whisper, game-file access, or memory inspection.
+When Path of Exile changes item text or Trade metadata, add a sanitized fixture first, watch the test fail, then update parsing or mapping. Preserve metadata group/type and item header evidence. Never choose the first fuzzy stat match: ambiguous modifiers must stay visible and unchecked. Do not add cookie/session discovery, synthesized input, seller whisper, game-file access, or memory inspection.
+
+Search profiles are deterministic: Crafting Base uses identity, item level, maximum requirements, intrinsic properties, and implicits; Quick Price selects confidently resolved relevant filters; Broad relaxes Quick Price bounds by ten percent. Trade fetch requests must remain at ten IDs or fewer.
 
 Focused test command:
 

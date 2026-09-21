@@ -1,4 +1,4 @@
-param([string]$Version = '1.2.0')
+param([string]$Version = '1.3.0')
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -25,6 +25,21 @@ if (-not (Test-Path -LiteralPath $exe)) { throw 'Payload does not contain the ap
 $fileVersion = (Get-Item -LiteralPath $exe).VersionInfo.FileVersion
 if (-not $fileVersion.StartsWith($Version, [StringComparison]::Ordinal)) {
     throw "Payload version $fileVersion does not match $Version."
+}
+$forbidden = @('Update.exe', 'Squirrel.exe', 'RELEASES', 'Velopack', 'UpdateManager')
+$payloadFiles = Get-ChildItem -LiteralPath $appExtract -Recurse -File
+foreach ($file in $payloadFiles) {
+    if ($forbidden -contains $file.Name) { throw "Forbidden updater payload found: $($file.Name)" }
+}
+$exeBytes = [IO.File]::ReadAllBytes($exe)
+$exeText = [Text.Encoding]::ASCII.GetString($exeBytes)
+if (-not $exeText.Contains('PoeTradeOverlay.dll')) { throw 'Single-file payload does not embed PoeTradeOverlay.dll.' }
+$textFiles = $payloadFiles | Where-Object { $_.Extension -in @('.json', '.config', '.xml', '.txt') }
+foreach ($file in $textFiles) {
+    $text = Get-Content -LiteralPath $file.FullName -Raw -ErrorAction SilentlyContinue
+    if ($text -match 'pedro-quiterio/.+releases|api\.github\.com/repos/pedro-quiterio') {
+        throw "External upstream update URL found in $($file.Name)."
+    }
 }
 $scriptText = Get-Content -LiteralPath $installScript -Raw
 if ($scriptText -notmatch "DisplayVersion -Value '$([Regex]::Escape($Version))'") {
