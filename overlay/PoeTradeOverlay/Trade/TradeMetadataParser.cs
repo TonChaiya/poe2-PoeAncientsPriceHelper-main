@@ -4,7 +4,7 @@ using PoeTradeOverlay.Models;
 namespace PoeTradeOverlay.Trade;
 
 public sealed record TradeItemDefinition(string Id, string Name, string? Category);
-public sealed record TradeStatDefinition(string Id, string Text, ModifierKind Kind);
+public sealed record TradeStatDefinition(string Id, string Text, ModifierKind Kind, string? Group = null);
 public sealed record TradeFilterDefinition(string Id, string Text);
 public sealed record TradeMetadataSnapshot(
     IReadOnlyList<TradeItemDefinition> Items,
@@ -60,12 +60,23 @@ internal static class TradeMetadataParser
         return definitions.ToArray();
     }
 
-    private static TradeStatDefinition[] ParseStats(JsonElement root) =>
-        Entries(root).Select(x => new TradeStatDefinition(
-                x.GetProperty("id").GetString() ?? "",
-                x.GetProperty("text").GetString() ?? "",
-                ParseKind(x.TryGetProperty("type", out var type) ? type.GetString() : null)))
-            .Where(x => x.Id.Length > 0 && x.Text.Length > 0).ToArray();
+    private static TradeStatDefinition[] ParseStats(JsonElement root)
+    {
+        var result = new List<TradeStatDefinition>();
+        foreach (var group in root.GetProperty("result").EnumerateArray())
+        {
+            string? groupId = group.TryGetProperty("id", out var groupNode) ? groupNode.GetString() : null;
+            if (!group.TryGetProperty("entries", out var entries) || entries.ValueKind != JsonValueKind.Array) continue;
+            foreach (var x in entries.EnumerateArray())
+            {
+                string id = x.TryGetProperty("id", out var idNode) ? idNode.GetString() ?? "" : "";
+                string text = x.TryGetProperty("text", out var textNode) ? textNode.GetString() ?? "" : "";
+                string? type = x.TryGetProperty("type", out var typeNode) ? typeNode.GetString() : groupId;
+                if (id.Length > 0 && text.Length > 0) result.Add(new(id, text, ParseKind(type), groupId));
+            }
+        }
+        return result.ToArray();
+    }
 
     private static TradeFilterDefinition[] ParseFilters(JsonElement root) =>
         Entries(root).Select(x => new TradeFilterDefinition(
@@ -87,8 +98,14 @@ internal static class TradeMetadataParser
     {
         "implicit" => ModifierKind.Implicit,
         "explicit" => ModifierKind.Explicit,
+        "pseudo" => ModifierKind.Pseudo,
+        "fractured" => ModifierKind.Fractured,
+        "crafted" => ModifierKind.Crafted,
         "enchant" => ModifierKind.Enchant,
-        "rune" => ModifierKind.Rune,
+        "rune" or "augment" => ModifierKind.Rune,
+        "desecrated" => ModifierKind.Desecrated,
+        "sanctum" => ModifierKind.Sanctum,
+        "skill" => ModifierKind.Skill,
         _ => ModifierKind.Unknown
     };
 }

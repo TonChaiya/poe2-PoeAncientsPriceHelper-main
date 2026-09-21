@@ -1,37 +1,28 @@
 using PoeTradeOverlay.Abstractions;
+using PoeTradeOverlay.Models;
+using PoeTradeOverlay.Pricing;
 
 namespace PoeAncientsPriceHelper;
 
 internal sealed class OverlayCurrencyConverter(Func<IReadOnlyDictionary<string, PriceEntry>> prices) : ICurrencyConverter
 {
-    private static readonly Dictionary<string, string> Aliases = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["divine"] = "divine orb",
-        ["div"] = "divine orb",
-        ["chaos"] = "chaos orb",
-        ["alch"] = "orb of alchemy",
-        ["regal"] = "regal orb"
-    };
-
     public bool TryToExalted(string currency, decimal amount, out decimal exalted)
     {
-        exalted = 0;
-        if (amount <= 0 || string.IsNullOrWhiteSpace(currency)) return false;
-        if (currency.Equals("exalted", StringComparison.OrdinalIgnoreCase) ||
-            currency.Equals("exa", StringComparison.OrdinalIgnoreCase) ||
-            currency.Equals("exalted orb", StringComparison.OrdinalIgnoreCase))
-        {
-            exalted = amount;
-            return true;
-        }
-
-        string display = Aliases.TryGetValue(currency.Trim(), out var alias) ? alias : currency.Trim();
-        string key = Normalize(display);
-        if (!prices().TryGetValue(key, out var entry) || !entry.HasMarketData || entry.ExaltedValue <= 0)
-            return false;
-        exalted = amount * entry.ExaltedValue;
-        return true;
+        var result = Convert(currency, amount);
+        exalted = result.ExaltedValue ?? 0m;
+        return result.ExaltedValue is not null;
     }
 
-    private static string Normalize(string value) => new(value.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
+    public CurrencyConversion Convert(string currency, decimal amount)
+    {
+        if (amount <= 0 || string.IsNullOrWhiteSpace(currency))
+            return new(currency, currency, amount, null, CurrencyRateSource.Unavailable);
+        string display = CurrencyCatalog.DisplayName(currency);
+        string key = CurrencyCatalog.Normalize(display);
+        if (key == CurrencyCatalog.Normalize("Exalted Orb"))
+            return new(currency, display, amount, amount, CurrencyRateSource.Identity);
+        if (!prices().TryGetValue(key, out var entry) || !entry.HasMarketData || entry.ExaltedValue <= 0)
+            return new(currency, display, amount, null, CurrencyRateSource.Unavailable);
+        return new(currency, display, amount, amount * entry.ExaltedValue, CurrencyRateSource.LiveEconomy);
+    }
 }

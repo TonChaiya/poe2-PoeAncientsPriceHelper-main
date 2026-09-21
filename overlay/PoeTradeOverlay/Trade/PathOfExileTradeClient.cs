@@ -10,7 +10,8 @@ namespace PoeTradeOverlay.Trade;
 
 public sealed class PathOfExileTradeClient : ITradeClient
 {
-    private const int MaxFetchIds = 20;
+    internal const int FetchChunkSize = 10;
+    internal const int MaxSampleSize = 20;
     private const int MaxBodyBytes = 2 * 1024 * 1024;
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(12);
     private readonly HttpClient _http;
@@ -58,22 +59,35 @@ public sealed class PathOfExileTradeClient : ITradeClient
             int total = searchDoc.RootElement.TryGetProperty("total", out var totalNode) && totalNode.TryGetInt32(out int parsedTotal)
                 ? parsedTotal : resultNode.GetArrayLength();
             var ids = resultNode.EnumerateArray().Select(x => x.GetString()).Where(x => !string.IsNullOrWhiteSpace(x))
-                .Take(MaxFetchIds).Cast<string>().ToArray();
+                .Take(MaxSampleSize).Cast<string>().ToArray();
             if (ids.Length == 0) return new TradeSearchResult(searchId, total, []);
+            var listings = new List<TradeListing>();
+            foreach (var chunk in ids.Chunk(FetchChunkSize))
+            {
+                string fetchUrl = "https://www.pathofexile.com/api/trade2/fetch/" + string.Join(',', chunk) +
+                                  "?query=" + Uri.EscapeDataString(searchId);
+                using var fetchRequest = CreateRequest(HttpMethod.Get, fetchUrl);
+                using var fetchResponse = await _http.SendAsync(fetchRequest, HttpCompletionOption.ResponseHeadersRead, timeout.Token);
+                _rateLimits.Observe(fetchResponse, _clock.GetUtcNow());
+                if (!fetchResponse.IsSuccessStatusCode)
+                {
+                    if (listings.Count > 0)
+                        return new(searchId, total, listings,
+                            new(TradeFailureKind.PartialFetch, "Some Trade listings could not be loaded.",
+                                fetchResponse.StatusCode == HttpStatusCode.TooManyRequests
+                                    ? _rateLimits.BlockedUntil ?? _clock.GetUtcNow().AddSeconds(60) : null));
+                    if (fetchResponse.StatusCode == HttpStatusCode.TooManyRequests)
+                        return Failed(TradeFailureKind.RateLimited, "Trade fetch is rate limited.",
+                            _rateLimits.BlockedUntil ?? _clock.GetUtcNow().AddSeconds(60));
+                    return Failed(fetchResponse.StatusCode == HttpStatusCode.BadRequest
+                            ? TradeFailureKind.InvalidQuery : TradeFailureKind.Unavailable,
+                        $"Trade fetch returned HTTP {(int)fetchResponse.StatusCode}.");
+                }
 
-            string fetchUrl = "https://www.pathofexile.com/api/trade2/fetch/" + string.Join(',', ids) +
-                              "?query=" + Uri.EscapeDataString(searchId);
-            using var fetchRequest = CreateRequest(HttpMethod.Get, fetchUrl);
-            using var fetchResponse = await _http.SendAsync(fetchRequest, HttpCompletionOption.ResponseHeadersRead, timeout.Token);
-            _rateLimits.Observe(fetchResponse, _clock.GetUtcNow());
-            if (fetchResponse.StatusCode == HttpStatusCode.TooManyRequests)
-                return Failed(TradeFailureKind.RateLimited, "Trade fetch is rate limited.",
-                    _rateLimits.BlockedUntil ?? _clock.GetUtcNow().AddSeconds(60));
-            if (!fetchResponse.IsSuccessStatusCode)
-                return Failed(TradeFailureKind.Unavailable, $"Trade fetch returned HTTP {(int)fetchResponse.StatusCode}.");
-
-            string fetchJson = await BoundedHttpContent.ReadStringAsync(fetchResponse.Content, MaxBodyBytes, timeout.Token);
-            return new TradeSearchResult(searchId, total, ParseListings(fetchJson));
+                string fetchJson = await BoundedHttpContent.ReadStringAsync(fetchResponse.Content, MaxBodyBytes, timeout.Token);
+                listings.AddRange(ParseListings(fetchJson));
+            }
+            return new TradeSearchResult(searchId, total, listings);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {

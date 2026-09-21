@@ -35,17 +35,36 @@ public static class TradeQueryBuilder
     };
 
     public static TradeQuery CreateRecommended(ParsedItem item, TradeMetadataSnapshot metadata)
+        => Create(item, metadata, SearchProfile.QuickPrice);
+
+    public static TradeQuery Create(ParsedItem item, TradeMetadataSnapshot metadata, SearchProfile profile)
     {
         var filters = item.Modifiers.Select(modifier =>
         {
-            var match = ModifierMatcher.Match(modifier, metadata);
+            var resolved = ModifierMatcher.Resolve(modifier, metadata);
             decimal? value = modifier.Values.Count > 0 ? modifier.Values[0] : null;
-            return new TradeFilter(modifier.Text, match.StatId, match.IsSupported,
-                match.IsSupported, value, null);
+            bool supported = resolved.Status == ResolutionStatus.Resolved;
+            bool enabled = supported && (profile != SearchProfile.CraftingBase || resolved.Kind == ModifierKind.Implicit);
+            var range = profile == SearchProfile.Broad
+                ? SearchProfileRules.Broad(new NumericRange(value, null))
+                : new NumericRange(value, null);
+            return new TradeFilter(modifier.Text, resolved.StatId, supported,
+                enabled, range.Min, range.Max);
         }).ToArray();
 
         Categories.TryGetValue(item.ItemClass, out var category);
         string? name = item.Rarity == ItemRarity.Unique && item.Name.Length > 0 ? item.Name : null;
-        return new TradeQuery(name, item.BaseType, category, item.Rarity, item.Corrupted, filters);
+        var type = new TypeFilterSet(item.ItemLevel is { } ilvl ? new(ilvl, null) : null);
+        var requirements = new RequirementFilterSet(
+            item.Requirements.Level is { } level ? new(null, level) : null,
+            item.Requirements.Strength is { } strength ? new(null, strength) : null,
+            item.Requirements.Dexterity is { } dexterity ? new(null, dexterity) : null,
+            item.Requirements.Intelligence is { } intelligence ? new(null, intelligence) : null);
+        var equipment = new EquipmentFilterSet(
+            item.Quality is { } quality ? new(quality, null) : null,
+            item.Properties.TryGetValue("physical_dps", out var pdps) ? new(pdps, null) : null,
+            item.Properties.TryGetValue("attacks_per_second", out var aps) ? new(aps, null) : null);
+        return new TradeQuery(name, item.BaseType, category, item.Rarity, item.Corrupted, filters,
+            profile, type, requirements, equipment, new(item.Corrupted, item.States.Identified));
     }
 }

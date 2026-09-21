@@ -1,0 +1,14 @@
+Item Class: Belts
+Rarity: Normal
+Heavy Belt
+--------
+Requirements:
+Level: 50
+--------
+Item Level: 75
+--------
+{ Implicit Modifier — Stun }
+30(20-30)% increased Stun Threshold
+{ Implicit Modifier }
+Has 1(1-3) Charm Slot
+

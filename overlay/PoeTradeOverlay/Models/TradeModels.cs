@@ -1,5 +1,17 @@
 namespace PoeTradeOverlay.Models;
 
+public enum ResolutionStatus { Resolved, Unsupported, Ambiguous }
+public sealed record ResolvedModifier(ResolutionStatus Status, string? StatId,
+    ModifierKind Kind, string SourceText, string Explanation);
+public enum SearchProfile { CraftingBase, QuickPrice, Broad }
+public sealed record NumericRange(decimal? Min = null, decimal? Max = null);
+public sealed record TypeFilterSet(NumericRange? ItemLevel = null);
+public sealed record RequirementFilterSet(NumericRange? Level = null,
+    NumericRange? Strength = null, NumericRange? Dexterity = null, NumericRange? Intelligence = null);
+public sealed record EquipmentFilterSet(NumericRange? Quality = null,
+    NumericRange? PhysicalDps = null, NumericRange? AttacksPerSecond = null);
+public sealed record MiscFilterSet(bool? Corrupted = null, bool? Identified = null);
+
 public sealed record TradeFilter(
     string SourceText,
     string? StatId,
@@ -14,7 +26,18 @@ public sealed record TradeQuery(
     string? Category,
     ItemRarity Rarity,
     bool? Corrupted,
-    IReadOnlyList<TradeFilter> Filters);
+    IReadOnlyList<TradeFilter> Filters,
+    SearchProfile Profile = SearchProfile.QuickPrice,
+    TypeFilterSet? ParsedTypeFilters = null,
+    RequirementFilterSet? ParsedRequirementFilters = null,
+    EquipmentFilterSet? ParsedEquipmentFilters = null,
+    MiscFilterSet? ParsedMiscFilters = null)
+{
+    public TypeFilterSet TypeFilters => ParsedTypeFilters ?? new();
+    public RequirementFilterSet RequirementFilters => ParsedRequirementFilters ?? new();
+    public EquipmentFilterSet EquipmentFilters => ParsedEquipmentFilters ?? new();
+    public MiscFilterSet MiscFilters => ParsedMiscFilters ?? new(Corrupted, true);
+}
 
 public sealed record TradeListing(
     string Id,
@@ -29,7 +52,8 @@ public enum TradeFailureKind
     RateLimited,
     InvalidQuery,
     Unavailable,
-    InvalidResponse
+    InvalidResponse,
+    PartialFetch
 }
 
 public sealed record TradeFailure(
@@ -53,4 +77,9 @@ public sealed record PriceEstimate(
     decimal RangeHighExalted,
     decimal MedianExalted,
     PriceConfidence Confidence,
-    string ConfidenceReason);
+    string ConfidenceReason,
+    decimal ConversionCoverage = 1m);
+
+public enum CurrencyRateSource { Identity, LiveEconomy, Unavailable }
+public sealed record CurrencyConversion(string OriginalCurrency, string DisplayName,
+    decimal OriginalAmount, decimal? ExaltedValue, CurrencyRateSource Source);

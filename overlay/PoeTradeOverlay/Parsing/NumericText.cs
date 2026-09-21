@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using PoeTradeOverlay.Models;
 
 namespace PoeTradeOverlay.Parsing;
 
@@ -10,6 +11,9 @@ internal static partial class NumericText
 
     [GeneratedRegex(@"(?<min>\d+(?:\.\d+)?)\s*-\s*(?<max>\d+(?:\.\d+)?)", RegexOptions.CultureInvariant)]
     private static partial Regex UnsignedRangePattern();
+
+    [GeneratedRegex(@"(?<current>[-+]?\d+(?:\.\d+)?)\s*\(\s*(?<min>[-+]?\d+(?:\.\d+)?)\s*-\s*(?<max>[-+]?\d+(?:\.\d+)?)\s*\)", RegexOptions.CultureInvariant)]
+    private static partial Regex RollPattern();
 
     public static IReadOnlyList<decimal> Values(string text) =>
         NumberPattern().Matches(text)
@@ -33,4 +37,19 @@ internal static partial class NumericText
         min = max = 0;
         return false;
     }
+
+    public static IReadOnlyList<NumericRoll> Rolls(string text)
+    {
+        var rolls = new List<NumericRoll>();
+        foreach (Match match in RollPattern().Matches(text))
+        {
+            rolls.Add(new NumericRoll(Parse(match, "current"), Parse(match, "min"), Parse(match, "max")));
+        }
+        if (rolls.Count > 0) return rolls;
+        return Values(text).Select(value => new NumericRoll(value, null, null)).ToArray();
+    }
+
+    private static decimal Parse(Match match, string group) =>
+        decimal.Parse(match.Groups[group].Value, NumberStyles.Number | NumberStyles.AllowLeadingSign,
+            CultureInfo.InvariantCulture);
 }
