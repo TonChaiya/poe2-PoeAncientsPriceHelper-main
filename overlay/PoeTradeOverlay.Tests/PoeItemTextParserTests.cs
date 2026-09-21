@@ -57,6 +57,27 @@ public sealed class PoeItemTextParserTests
         Assert.Contains(item.Modifiers, x => x.Text == "30% increased Movement Speed");
     }
 
+    [Fact]
+    public void Colon_requirement_line_is_parsed_and_never_becomes_a_modifier()
+    {
+        const string text = """
+            Item Class: Belts
+            Rarity: Normal
+            Heavy Belt
+            --------
+            Item Level: 75
+            --------
+            Requires: Level 50
+            --------
+            { Implicit Modifier }
+            Has 1(1-3) Charm Slot
+            """;
+
+        Assert.True(PoeItemTextParser.TryParse(text, out var item));
+        Assert.Equal(50, item.Requirements.Level);
+        Assert.DoesNotContain(item.Modifiers, x => x.Text.StartsWith("Requires", StringComparison.OrdinalIgnoreCase));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("ordinary clipboard text")]

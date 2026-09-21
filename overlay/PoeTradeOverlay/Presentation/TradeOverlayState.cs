@@ -11,4 +11,6 @@ public sealed record TradeOverlayState(
     TradeFailure? Failure,
     string Status,
     IReadOnlyList<TradeListing>? Listings = null,
-    IReadOnlyList<CurrencyConversion>? ListingConversions = null);
+    IReadOnlyList<CurrencyConversion>? ListingConversions = null,
+    string? SearchId = null,
+    string? League = null);

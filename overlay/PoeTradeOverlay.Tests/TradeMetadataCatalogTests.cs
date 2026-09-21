@@ -88,7 +88,7 @@ public sealed class TradeMetadataCatalogTests
         Assert.Equal(3, handler.Requests.Count);
         Assert.All(handler.Requests, request =>
         {
-            Assert.Contains("Poe2GroundLootPriceHelper/1.3.0", request.UserAgent);
+            Assert.Contains("Poe2GroundLootPriceHelper/1.3.1", request.UserAgent);
             Assert.Null(request.Authorization);
             Assert.Null(request.Cookie);
         });

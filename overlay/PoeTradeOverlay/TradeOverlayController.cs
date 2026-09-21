@@ -141,7 +141,7 @@ public sealed class TradeOverlayController : IAsyncDisposable
             _ => "Price estimate ready"
         };
         _view.Publish(new TradeOverlayState(generation, item, query, false, estimate, result.Failure, status,
-            result.Listings, conversions));
+            result.Listings, conversions, result.SearchId, league));
     }
 
     private bool IsCurrent(long generation, CancellationToken token) =>

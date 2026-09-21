@@ -1,8 +1,8 @@
-# PoE 2 Ground Loot + Detailed Trade Price Helper — fork 1.3.0
+# PoE 2 Ground Loot + Detailed Trade Price Helper — fork 1.3.1
 
 Windows overlay for Path of Exile 2 that scans visible ground-item labels and places the current market price immediately after each label. It keeps the game's item name visible and works across the viewport rather than only a calibrated price panel.
 
-Version 1.3.0 rebuilds detailed equipment pricing around Trade modifier families, three search profiles, Instant Buy listings, mixed-currency conversion, and the 420-DIP Professional Compact window. Hover an item in PoE 2 and press the game's normal `Ctrl+C`; the helper reads that copied item only. Choose Edit only for keyboard input, preferably while PoE 2 uses Borderless mode.
+Version 1.3.1 fixes all interaction surfaces in the 420-DIP Professional Compact window: Edit unlocks selectable Min/Max fields, modifier checkboxes have dedicated hit areas, the title drag surface no longer intercepts buttons, `Requires:` lines stay out of modifier filters, and every fetched listing can open its official Trade result. Hover an item in PoE 2 and press the game's normal `Ctrl+C`; the helper reads that copied item only.
 
 ## Highlights
 
@@ -17,7 +17,7 @@ Version 1.3.0 rebuilds detailed equipment pricing around Trade modifier families
 
 ## Install
 
-Run `install/Poe2GroundLootPriceHelper-v1.3.0-Setup.exe`. It installs per user, requires no administrator rights, and includes the required .NET runtime. Close an older running copy before installing.
+Run `install/Poe2GroundLootPriceHelper-v1.3.1-Setup.exe`. It installs per user, requires no administrator rights, and includes the required .NET runtime. Close an older running copy before installing.
 
 After launch, choose the league and start the ground-loot scan. For detailed equipment pricing, hover the item and press `Ctrl+C`; supported weapons, armour, accessories, jewels, and charms open the filter window. Settings can disable this behavior.
 
@@ -29,7 +29,7 @@ The Trade website search surface can change without notice. The helper honors re
 
 ## Development
 
-See the [developer documentation](docs/README.md), [overlay module notes](overlay/README.md), [fork provenance](FORK_NOTES.md), [changelog](CHANGELOG.md), and [1.3.0 release record](docs/releases/1.3.0.md).
+See the [developer documentation](docs/README.md), [overlay module notes](overlay/README.md), [fork provenance](FORK_NOTES.md), [changelog](CHANGELOG.md), and [1.3.1 release record](docs/releases/1.3.1.md).
 
 ```powershell
 dotnet test PoeAncientsPriceHelper.sln -c Release

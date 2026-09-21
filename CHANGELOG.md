@@ -3,6 +3,21 @@
 All notable changes to the TonChaiya fork are documented here. This project uses an independent
 version sequence beginning at 1.0.0; it does not continue the upstream project's version numbers.
 
+## 1.3.1 — 2026-09-21
+
+### Fixed
+
+- Split the draggable title surface from Edit and Close so routed mouse events no longer swallow button clicks.
+- Added explicit local templates and hit areas for editable Min/Max fields and modifier checkboxes.
+- Recognize `Requires: Level ...` as an item property instead of an unsupported Trade modifier.
+- Added a safe per-listing button that opens the corresponding anonymous official Trade result.
+
+### UI and safety
+
+- Tightened modifier row spacing and listing columns while preserving the approved 420-DIP compact layout.
+- Editing remains opt-in and passive mode still avoids taking focus from the game.
+- Official Trade links use only the selected league and returned search ID; no account session or game access is introduced.
+
 ## 1.3.0 — 2026-09-21
 
 ### Added

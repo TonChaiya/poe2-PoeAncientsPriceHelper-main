@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -67,12 +68,38 @@ public partial class TradeOverlayWindow : Window, ITradeOverlayView
 
     private void Edit_Click(object sender, RoutedEventArgs e)
     {
-        if (!_interaction.IsEditing) _returnFocus = GetForegroundWindow();
-        _interaction.ToggleEditing();
+        if (!_interaction.IsEditing)
+        {
+            _returnFocus = GetForegroundWindow();
+            _interaction.BeginEditing();
+            _viewModel.BeginEditing();
+        }
+        else
+        {
+            _interaction.EndEditing();
+            _viewModel.EndEditing();
+        }
         EditButton.Content = _interaction.IsEditing ? "Done" : "Edit";
         ApplyActivationMode();
-        if (_interaction.IsEditing) Activate();
+        if (_interaction.IsEditing)
+        {
+            Activate();
+            Focus();
+        }
         else RestorePreviousFocus();
+    }
+
+    private void OpenListing_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: ListingRowViewModel { OpenUrl: { } url } }) return;
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch
+        {
+            // The result remains visible when Windows has no browser association.
+        }
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)
@@ -164,6 +191,7 @@ public partial class TradeOverlayWindow : Window, ITradeOverlayView
     private void ResetInteraction(bool restoreFocus = false)
     {
         _interaction.Reset();
+        _viewModel.EndEditing();
         EditButton.Content = "Edit";
         ApplyActivationMode();
         if (restoreFocus) RestorePreviousFocus();

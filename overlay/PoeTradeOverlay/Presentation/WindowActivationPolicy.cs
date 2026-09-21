@@ -13,5 +13,7 @@ internal sealed class WindowInteractionMode
 {
     internal bool IsEditing { get; private set; }
     internal void ToggleEditing() => IsEditing = !IsEditing;
-    internal void Reset() => IsEditing = false;
+    internal void BeginEditing() => IsEditing = true;
+    internal void EndEditing() => IsEditing = false;
+    internal void Reset() => EndEditing();
 }

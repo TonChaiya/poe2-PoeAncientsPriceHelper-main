@@ -79,7 +79,8 @@ public static class PoeItemTextParser
                 propertyBlocks.Add(new("attacks_per_second", line, NumericText.Values(line)));
                 continue;
             }
-            if (line.StartsWith("Requires Level ", StringComparison.OrdinalIgnoreCase))
+            if (line.StartsWith("Requires Level ", StringComparison.OrdinalIgnoreCase) ||
+                line.StartsWith("Requires:", StringComparison.OrdinalIgnoreCase))
             {
                 requiredLevel = ValueFollowing(line, "Level");
                 requiredStrength = ValueFollowing(line, "Str");
@@ -147,6 +148,7 @@ public static class PoeItemTextParser
     private static bool IsNonModifierProperty(string line) =>
         line.StartsWith("Requirements:", StringComparison.OrdinalIgnoreCase) ||
         line.StartsWith("Requires Level ", StringComparison.OrdinalIgnoreCase) ||
+        line.StartsWith("Requires:", StringComparison.OrdinalIgnoreCase) ||
         line.StartsWith("Level:", StringComparison.OrdinalIgnoreCase) ||
         line.StartsWith("Str:", StringComparison.OrdinalIgnoreCase) ||
         line.StartsWith("Dex:", StringComparison.OrdinalIgnoreCase) ||

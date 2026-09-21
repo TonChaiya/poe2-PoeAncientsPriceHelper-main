@@ -99,6 +99,34 @@ public sealed class TradeOverlayViewModelTests
         Assert.Equal("seller#1234", vm.Listings.Single().Account);
     }
 
+    [Fact]
+    public void Listing_exposes_safe_official_trade_search_url()
+    {
+        var query = new TradeQuery(null, "Heavy Belt", "accessory.belt", ItemRarity.Normal, false, []);
+        var state = State(query) with
+        {
+            Listings = [new TradeListing("result-a", "seller", 5m, "vaal")],
+            SearchId = "search/abc",
+            League = "Future League"
+        };
+        var vm = new TradeOverlayViewModel();
+        vm.Apply(state);
+
+        Assert.Equal("https://www.pathofexile.com/trade2/search/poe2/Future%20League/search%2Fabc",
+            vm.Listings.Single().OpenUrl);
+    }
+
+    [Fact]
+    public void Explicit_edit_mode_controls_whether_numeric_text_can_be_edited()
+    {
+        var vm = new TradeOverlayViewModel();
+        Assert.False(vm.IsEditing);
+        vm.BeginEditing();
+        Assert.True(vm.IsEditing);
+        vm.EndEditing();
+        Assert.False(vm.IsEditing);
+    }
+
     private static TradeOverlayState State(TradeQuery query) => new(1,
         new ParsedItem(ItemRarity.Rare, "Storm Loop", "Ring", "Rings", 80, 20, false, [],
             new Dictionary<string, decimal>()), query, false, null, null, "Item read");

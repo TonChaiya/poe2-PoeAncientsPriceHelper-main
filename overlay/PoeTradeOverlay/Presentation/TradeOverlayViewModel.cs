@@ -9,6 +9,7 @@ public sealed class TradeOverlayViewModel : INotifyPropertyChanged
 {
     private TradeOverlayState? _state;
     private SearchProfile _selectedProfile = SearchProfile.QuickPrice;
+    private bool _isEditing;
     public ObservableCollection<FilterRowViewModel> Filters { get; } = [];
     public ObservableCollection<FilterRowViewModel> SupportedFilters { get; } = [];
     public ObservableCollection<FilterRowViewModel> UnsupportedFilters { get; } = [];
@@ -46,6 +47,7 @@ public sealed class TradeOverlayViewModel : INotifyPropertyChanged
     public bool IsCraftingBase => _selectedProfile == SearchProfile.CraftingBase;
     public bool IsQuickPrice => _selectedProfile == SearchProfile.QuickPrice;
     public bool IsBroad => _selectedProfile == SearchProfile.Broad;
+    public bool IsEditing => _isEditing;
 
     public void Apply(TradeOverlayState state)
     {
@@ -79,7 +81,8 @@ public sealed class TradeOverlayViewModel : INotifyPropertyChanged
         foreach (var listing in state.Listings ?? [])
         {
             Listings.Add(new ListingRowViewModel(listing,
-                listingIndex < conversions.Count ? conversions[listingIndex] : null));
+                listingIndex < conversions.Count ? conversions[listingIndex] : null,
+                state.League, state.SearchId));
             listingIndex++;
         }
         RaiseAll();
@@ -94,6 +97,20 @@ public sealed class TradeOverlayViewModel : INotifyPropertyChanged
         _selectedProfile = profile;
         foreach (var filter in Filters) filter.ApplyProfile(profile);
         RaiseAll();
+    }
+
+    public void BeginEditing()
+    {
+        if (_isEditing) return;
+        _isEditing = true;
+        Raise(nameof(IsEditing));
+    }
+
+    public void EndEditing()
+    {
+        if (!_isEditing) return;
+        _isEditing = false;
+        Raise(nameof(IsEditing));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -35,4 +35,16 @@ public sealed class WindowActivationPolicyTests
 
         Assert.False(mode.IsEditing);
     }
+
+    [Fact]
+    public void Interaction_mode_has_idempotent_begin_and_end_operations()
+    {
+        var mode = new WindowInteractionMode();
+        mode.BeginEditing();
+        mode.BeginEditing();
+        Assert.True(mode.IsEditing);
+        mode.EndEditing();
+        mode.EndEditing();
+        Assert.False(mode.IsEditing);
+    }
 }
