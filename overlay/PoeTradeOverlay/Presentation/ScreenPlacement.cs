@@ -23,3 +23,10 @@ public static class ScreenPlacement
 
     private static double Clamp(double value, double min, double max) => Math.Max(min, Math.Min(value, max));
 }
+
+internal sealed record PassiveWindowMovement(Point Target, bool UseNoActivate)
+{
+    internal static PassiveWindowMovement FromDrag(Point cursorStart, Point cursorNow, Point windowStart) =>
+        new(new Point(windowStart.X + cursorNow.X - cursorStart.X,
+            windowStart.Y + cursorNow.Y - cursorStart.Y), true);
+}

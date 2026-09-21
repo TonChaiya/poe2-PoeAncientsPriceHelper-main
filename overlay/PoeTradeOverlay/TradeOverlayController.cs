@@ -122,12 +122,26 @@ public sealed class TradeOverlayController : IAsyncDisposable
         lock (_gate) league = _league;
         var result = await _trade.SearchAsync(league, query, token);
         if (!IsCurrent(generation, token)) return;
-        var estimate = result.Failure is null
+        var estimate = result.Failure is null || result.Failure.Kind == TradeFailureKind.PartialFetch
             ? PriceEstimator.Estimate(result.Listings, result.TotalMatches, _currency)
             : null;
-        string status = result.Failure?.Message ?? (estimate is null ? "No priced listings found" : "Price estimate ready");
+        var conversions = result.Listings.Select(listing => listing.Amount is { } amount &&
+                                                             !string.IsNullOrWhiteSpace(listing.Currency)
+            ? _currency.Convert(listing.Currency, amount)
+            : new CurrencyConversion(listing.Currency ?? "", listing.Currency ?? "", listing.Amount ?? 0,
+                null, CurrencyRateSource.Unavailable)).ToArray();
+        string status = result.Failure?.Kind switch
+        {
+            TradeFailureKind.PartialFetch when estimate is not null => "Partial sample — estimate uses available listings",
+            TradeFailureKind.RateLimited when result.Failure.RetryAt is { } retry =>
+                $"Trade rate limit — retry after {retry.LocalDateTime:HH:mm:ss}",
+            _ when result.Failure is not null => result.Failure.Message,
+            _ when estimate is null && query.Profile != SearchProfile.Broad => "No priced listings — try Broad −10%",
+            _ when estimate is null => "No priced listings found",
+            _ => "Price estimate ready"
+        };
         _view.Publish(new TradeOverlayState(generation, item, query, false, estimate, result.Failure, status,
-            result.Listings));
+            result.Listings, conversions));
     }
 
     private bool IsCurrent(long generation, CancellationToken token) =>

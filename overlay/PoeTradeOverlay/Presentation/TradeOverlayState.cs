@@ -10,4 +10,5 @@ public sealed record TradeOverlayState(
     PriceEstimate? Estimate,
     TradeFailure? Failure,
     string Status,
-    IReadOnlyList<TradeListing>? Listings = null);
+    IReadOnlyList<TradeListing>? Listings = null,
+    IReadOnlyList<CurrencyConversion>? ListingConversions = null);

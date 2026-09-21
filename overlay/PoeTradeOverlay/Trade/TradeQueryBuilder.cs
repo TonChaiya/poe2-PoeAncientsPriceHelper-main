@@ -35,7 +35,7 @@ public static class TradeQueryBuilder
     };
 
     public static TradeQuery CreateRecommended(ParsedItem item, TradeMetadataSnapshot metadata)
-        => Create(item, metadata, SearchProfile.QuickPrice);
+        => Create(item, metadata, item.Rarity == ItemRarity.Normal ? SearchProfile.CraftingBase : SearchProfile.QuickPrice);
 
     public static TradeQuery Create(ParsedItem item, TradeMetadataSnapshot metadata, SearchProfile profile)
     {
@@ -49,7 +49,7 @@ public static class TradeQueryBuilder
                 ? SearchProfileRules.Broad(new NumericRange(value, null))
                 : new NumericRange(value, null);
             return new TradeFilter(modifier.Text, resolved.StatId, supported,
-                enabled, range.Min, range.Max);
+                enabled, range.Min, range.Max, resolved.Status, resolved.Kind);
         }).ToArray();
 
         Categories.TryGetValue(item.ItemClass, out var category);

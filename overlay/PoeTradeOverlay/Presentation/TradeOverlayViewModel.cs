@@ -8,6 +8,7 @@ namespace PoeTradeOverlay.Presentation;
 public sealed class TradeOverlayViewModel : INotifyPropertyChanged
 {
     private TradeOverlayState? _state;
+    private SearchProfile _selectedProfile = SearchProfile.QuickPrice;
     public ObservableCollection<FilterRowViewModel> Filters { get; } = [];
     public ObservableCollection<FilterRowViewModel> SupportedFilters { get; } = [];
     public ObservableCollection<FilterRowViewModel> UnsupportedFilters { get; } = [];
@@ -41,6 +42,10 @@ public sealed class TradeOverlayViewModel : INotifyPropertyChanged
     public string UnsupportedCountText => $"{UnsupportedFilters.Count} unsupported modifier{(UnsupportedFilters.Count == 1 ? "" : "s")}";
     public bool HasListings => Listings.Count > 0;
     public bool CanSearch => _state?.Query is not null && !IsLoading && Filters.All(x => x.IsValid);
+    public SearchProfile SelectedProfile => _selectedProfile;
+    public bool IsCraftingBase => _selectedProfile == SearchProfile.CraftingBase;
+    public bool IsQuickPrice => _selectedProfile == SearchProfile.QuickPrice;
+    public bool IsBroad => _selectedProfile == SearchProfile.Broad;
 
     public void Apply(TradeOverlayState state)
     {
@@ -48,6 +53,7 @@ public sealed class TradeOverlayViewModel : INotifyPropertyChanged
         bool replaceFilters = state.Query is not null &&
                               (newGeneration || _state?.Item != state.Item || _state.Query is null);
         _state = state;
+        if (replaceFilters && state.Query is not null) _selectedProfile = state.Query.Profile;
         if (state.Query is null && newGeneration)
         {
             Filters.Clear();
@@ -68,13 +74,27 @@ public sealed class TradeOverlayViewModel : INotifyPropertyChanged
             }
         }
         Listings.Clear();
-        foreach (var listing in state.Listings ?? []) Listings.Add(new ListingRowViewModel(listing));
+        var conversions = state.ListingConversions ?? [];
+        int listingIndex = 0;
+        foreach (var listing in state.Listings ?? [])
+        {
+            Listings.Add(new ListingRowViewModel(listing,
+                listingIndex < conversions.Count ? conversions[listingIndex] : null));
+            listingIndex++;
+        }
         RaiseAll();
     }
 
     public TradeQuery? BuildEditedQuery() => _state?.Query is { } query && Filters.All(x => x.IsValid)
-        ? query with { Filters = Filters.Select(x => x.ToFilter()).ToArray() }
+        ? query with { Filters = Filters.Select(x => x.ToFilter()).ToArray(), Profile = _selectedProfile }
         : null;
+
+    public void SetProfile(SearchProfile profile)
+    {
+        _selectedProfile = profile;
+        foreach (var filter in Filters) filter.ApplyProfile(profile);
+        RaiseAll();
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
     private void Raise([CallerMemberName] string? name = null) =>

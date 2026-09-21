@@ -18,7 +18,9 @@ public sealed record TradeFilter(
     bool IsSupported,
     bool IsEnabled,
     decimal? Min = null,
-    decimal? Max = null);
+    decimal? Max = null,
+    ResolutionStatus Resolution = ResolutionStatus.Resolved,
+    ModifierKind Kind = ModifierKind.Unknown);
 
 public sealed record TradeQuery(
     string? Name,

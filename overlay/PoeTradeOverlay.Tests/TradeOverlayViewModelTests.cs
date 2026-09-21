@@ -28,6 +28,36 @@ public sealed class TradeOverlayViewModelTests
     }
 
     [Fact]
+    public void Clear_min_removes_only_the_bound_and_keeps_query_valid()
+    {
+        var state = State(new TradeQuery(null, "Heavy Belt", "accessory.belt", ItemRarity.Normal, false,
+            [new TradeFilter("Stun Threshold", "implicit.stun", true, true, 30m, 40m,
+                ResolutionStatus.Resolved, ModifierKind.Implicit)]));
+        var vm = new TradeOverlayViewModel();
+        vm.Apply(state);
+        vm.Filters.Single().ClearMin.Execute(null);
+        Assert.Equal("", vm.Filters.Single().MinText);
+        Assert.Equal("40", vm.Filters.Single().MaxText);
+        Assert.True(vm.CanSearch);
+    }
+
+    [Fact]
+    public void Profile_change_is_local_and_updates_enabled_filters()
+    {
+        var state = State(new TradeQuery(null, "Heavy Belt", "accessory.belt", ItemRarity.Normal, false,
+        [
+            new("implicit", "implicit.a", true, true, 1m, null, ResolutionStatus.Resolved, ModifierKind.Implicit),
+            new("explicit", "explicit.a", true, true, 2m, null, ResolutionStatus.Resolved, ModifierKind.Explicit)
+        ], SearchProfile.QuickPrice));
+        var vm = new TradeOverlayViewModel();
+        vm.Apply(state);
+        vm.SetProfile(SearchProfile.CraftingBase);
+        Assert.True(vm.Filters[0].IsEnabled);
+        Assert.False(vm.Filters[1].IsEnabled);
+        Assert.Equal(SearchProfile.CraftingBase, vm.BuildEditedQuery()!.Profile);
+    }
+
+    [Fact]
     public void Formats_market_estimate_and_confidence()
     {
         var estimate = new PriceEstimate(120, 14, 10m, 12m, 18m, 15m,
